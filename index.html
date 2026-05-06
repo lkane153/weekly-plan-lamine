@@ -594,8 +594,8 @@ function renderExCard(ex, session, weights) {
   const wL = weights[ex.name+'_L'] || '';
   const wS = weights[ex.name] || '';
   let h = `<div class="ex-card">`;
-  const setsDisplay = ex.repsLabel ? `${ex.setsLabel} · ${ex.repsLabel} · ${ex.rest}` : `${ex.setsLabel} · ${ex.rest}`;
-  h += `<div class="ex-top"><span class="ex-name">${ex.name}</span><span class="ex-sets">${setsDisplay}</span></div>`;
+  h += `<div class="ex-top"><span class="ex-name">${ex.name}</span><span class="ex-sets">${ex.setsLabel} · ${ex.rest}</span></div>`;
+  if (ex.repsLabel) h += `<div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:6px">${ex.repsLabel}</div>`;
   if (ex.tempo || ex.breathe) {
     h += `<div class="ex-chips">`;
     if (ex.tempo)   h += `<span class="ex-chip chip-tempo">↕ ${ex.tempo}</span>`;
