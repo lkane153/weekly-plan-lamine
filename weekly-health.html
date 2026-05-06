@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>plan</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #f7f7f5; --surface: #ffffff; --text: #1a1a1a; --muted: #6b7280;
+  --border: #e5e7eb; --green: #2d6a4f; --green-light: #d8f3dc;
+  --amber: #d97706; --amber-light: #fef3c7; --blue: #2563eb; --blue-light: #dbeafe;
+  --purple: #7c3aed; --pink: #db2777; --red: #dc2626;
+  --radius: 12px; --nav: 68px; --hdr: 56px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; }
+.hdr { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: var(--hdr); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; }
+.hdr-logo { font-size: 16px; font-weight: 700; letter-spacing: -0.5px; }
+.hdr-week { font-size: 12px; color: var(--muted); }
+.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: var(--nav); background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; }
+.nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; background: none; border: none; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 0.4px; transition: color 0.15s; }
+.nav-tab.active { color: var(--green); }
+.nav-tab svg { width: 22px; height: 22px; }
+.main { padding-top: var(--hdr); padding-bottom: calc(var(--nav) + 8px); }
+.view { display: none; padding: 18px 16px; }
+.view.active { display: block; }
+.sec { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; margin-top: 22px; }
+.sec:first-child { margin-top: 0; }
+.card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px 16px; margin-bottom: 8px; }
+.day-strip { display: flex; gap: 7px; overflow-x: auto; padding: 2px 16px 14px; margin: 0 -16px; -ms-overflow-style: none; scrollbar-width: none; }
+.day-strip::-webkit-scrollbar { display: none; }
+.day-btn { flex-shrink: 0; width: 46px; height: 62px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; transition: all 0.15s; }
+.day-btn.active { border-color: var(--green); background: var(--green); }
+.day-btn.fast-day { border-color: var(--amber); background: var(--amber-light); }
+.day-btn.active.fast-day { background: var(--amber); border-color: var(--amber); }
+.day-btn.is-today:not(.active) { border-color: var(--blue); }
+.day-dname { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; }
+.day-btn.active .day-dname { color: rgba(255,255,255,0.75); }
+.day-dnum { font-size: 17px; font-weight: 700; color: var(--text); }
+.day-btn.active .day-dnum { color: #fff; }
+.day-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--green); }
+.day-btn.active .day-dot { background: rgba(255,255,255,0.6); }
+.day-btn.fast-day .day-dot { background: var(--amber); }
+.meal-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 13px 15px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
+.meal-card:active { border-color: var(--green); }
+.meal-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 3px; }
+.meal-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.meal-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.fast-banner { background: var(--amber-light); border: 1.5px solid var(--amber); border-radius: var(--radius); padding: 22px 16px; text-align: center; }
+.fast-title { font-size: 17px; font-weight: 700; color: #92400e; margin-bottom: 5px; }
+.fast-note { font-size: 13px; color: #b45309; }
+.day-note { background: var(--green-light); border-radius: 8px; padding: 9px 13px; margin-bottom: 10px; font-size: 12px; color: var(--green); font-weight: 500; }
+.wo-badge { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; margin-bottom: 14px; }
+.wo-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.wo-note { font-weight: 400; color: var(--muted); }
+.wo-header { border-radius: var(--radius); padding: 18px 16px; margin-bottom: 14px; color: #fff; }
+.wo-session-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; opacity: 0.75; margin-bottom: 3px; }
+.wo-session-name { font-size: 21px; font-weight: 700; margin-bottom: 3px; }
+.wo-session-note { font-size: 13px; opacity: 0.8; }
+.ex-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 13px 14px; margin-bottom: 8px; }
+.ex-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
+.ex-name { font-size: 14px; font-weight: 600; flex: 1; }
+.ex-sets { font-size: 11px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+.ex-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
+.ex-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+.chip-tempo { background: #fef3c7; color: #92400e; }
+.chip-breathe { background: var(--blue-light); color: #1e40af; }
+.ex-side { font-size: 11px; font-weight: 500; color: var(--green); background: var(--green-light); border-radius: 6px; padding: 6px 10px; margin-bottom: 7px; line-height: 1.5; }
+.ex-tip { font-size: 11px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
+.set-row { display: flex; gap: 8px; }
+.set-grp { flex: 1; }
+.set-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
+.set-inp { width: 100%; padding: 8px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 15px; font-weight: 500; background: var(--bg); color: var(--text); text-align: center; }
+.set-inp:focus { outline: none; border-color: var(--green); }
+.mob-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+.mob-name { font-size: 14px; font-weight: 500; }
+.mob-dur { font-size: 12px; color: var(--muted); }
+.rest-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px 16px; text-align: center; }
+.rest-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.rest-note { font-size: 13px; color: var(--muted); }
+.done-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-light); color: var(--green); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px; margin-bottom: 12px; }
+.btn { display: block; width: 100%; padding: 14px; border-radius: 10px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.btn:active { opacity: 0.75; }
+.btn-primary { background: var(--green); color: #fff; }
+.btn-outline { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+.btn-mt { margin-top: 16px; }
+.rec-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 9px; cursor: pointer; }
+.rec-bar { height: 6px; }
+.rec-body { padding: 13px 15px; }
+.rec-title { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+.rec-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.rec-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.rec-time { font-size: 11px; color: var(--muted); }
+.rec-ingr { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.rec-expanded { border-top: 1px solid var(--border); margin-top: 11px; padding-top: 11px; display: none; }
+.rec-card.open .rec-expanded { display: block; }
+.step-item { display: flex; gap: 9px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+.step-n { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.shop-item { display: flex; align-items: center; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.shop-item:last-child { border-bottom: none; }
+.shop-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.shop-item.checked .shop-check { border-color: var(--green); background: var(--green); }
+.shop-name { font-size: 14px; flex: 1; transition: color 0.15s; }
+.shop-item.checked .shop-name { text-decoration: line-through; color: var(--muted); }
+.shop-qty { font-size: 12px; color: var(--muted); }
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 14px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 3px; }
+.stat-val { font-size: 26px; font-weight: 700; }
+.stat-unit { font-size: 14px; font-weight: 400; color: var(--muted); }
+.stat-delta { font-size: 11px; margin-top: 3px; }
+.d-down { color: var(--green); } .d-up { color: var(--red); }
+.chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
+.chart-ttl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 10px; }
+canvas.chart { width: 100%; height: 150px; display: block; }
+.log-form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; margin-bottom: 14px; }
+.log-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 13px; }
+.fld-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 5px; }
+.fld-inp { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 17px; font-weight: 500; color: var(--text); background: var(--bg); }
+.fld-inp:focus { outline: none; border-color: var(--green); }
+.fld-unit { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.log-entry { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.log-entry:last-child { border-bottom: none; }
+.log-date { color: var(--muted); }
+.log-vals { display: flex; gap: 14px; }
+.log-val { font-weight: 600; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: flex-end; }
+.modal-overlay.open { display: flex; }
+.modal-sheet { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 20px 44px; width: 100%; max-height: 82vh; overflow-y: auto; }
+.modal-handle { width: 34px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+.modal-title { font-size: 19px; font-weight: 700; margin-bottom: 3px; }
+.modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+.modal-sec { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 8px; margin-top: 16px; }
+.ingr-item { display: flex; align-items: baseline; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.ingr-item:last-child { border-bottom: none; }
+.ingr-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 2px; }
+/* supplements */
+.supp-block { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 10px 13px; margin-bottom: 10px; }
+.supp-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--blue); margin-bottom: 7px; }
+.supp-row { font-size: 11px; display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid #dbeafe; gap: 8px; }
+.supp-row:last-child { border-bottom: none; }
+.supp-timing { font-weight: 600; color: #1e40af; white-space: nowrap; }
+.supp-items { color: #3b82f6; text-align: right; }
+/* snack card */
+.snack-card { background: var(--surface); border-radius: var(--radius); border: 1px dashed #c4b5fd; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
+.snack-card:active { border-color: var(--purple); }
+.snack-time { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--purple); margin-bottom: 2px; }
+/* warm-up */
+.warmup-item { display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; margin-bottom: 6px; align-items: flex-start; }
+.warmup-num { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--blue-light); color: var(--blue); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.warmup-body { flex: 1; }
+.warmup-name { font-size: 13px; font-weight: 600; margin-bottom: 1px; }
+.warmup-dur { font-size: 11px; color: var(--blue); font-weight: 500; }
+.warmup-note { font-size: 11px; color: var(--muted); line-height: 1.4; margin-top: 3px; }
+/* corrective mobility */
+.corr-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; margin-bottom: 7px; }
+.corr-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 8px; }
+.corr-name { font-size: 14px; font-weight: 600; }
+.corr-dur { font-size: 11px; color: var(--blue); font-weight: 600; white-space: nowrap; }
+.corr-note { font-size: 11px; color: var(--muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <span class="hdr-logo">plan</span>
+  <span class="hdr-week" id="hdr-week"></span>
+</header>
+
+<main class="main">
+  <div class="view active" id="view-week">
+    <div class="day-strip" id="day-strip"></div>
+    <div id="day-content"></div>
+  </div>
+  <div class="view" id="view-workout">
+    <div class="day-strip" id="wo-day-strip"></div>
+    <div id="wo-content"></div>
+  </div>
+  <div class="view" id="view-recipes">
+    <div id="rec-list"></div>
+  </div>
+  <div class="view" id="view-shopping">
+    <div class="sec">this week's list</div>
+    <div id="shop-list"></div>
+    <button class="btn btn-outline btn-mt" onclick="clearChecks()">clear completed</button>
+  </div>
+  <div class="view" id="view-progress">
+    <div class="stat-row" id="stat-row"></div>
+    <div class="chart-wrap">
+      <div class="chart-ttl">weight trend (kg)</div>
+      <canvas class="chart" id="w-chart"></canvas>
+    </div>
+    <div class="sec">log this week</div>
+    <div class="log-form">
+      <div class="log-fields">
+        <div>
+          <div class="fld-lbl">weight</div>
+          <input type="number" class="fld-inp" id="inp-weight" placeholder="98.0" step="0.1">
+          <div class="fld-unit">kg</div>
+        </div>
+        <div>
+          <div class="fld-lbl">body fat</div>
+          <input type="number" class="fld-inp" id="inp-bf" placeholder="—" step="0.1">
+          <div class="fld-unit">%</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="logProgress()">save check-in</button>
+    </div>
+    <div class="sec">history</div>
+    <div class="card" style="padding:0 16px"><div id="prog-hist"></div></div>
+  </div>
+</main>
+
+<nav class="nav">
+  <button class="nav-tab active" onclick="switchView('week',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>week
+  </button>
+  <button class="nav-tab" onclick="switchView('workout',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4v16M18 4v16M4 12h4M16 12h4M8 8h8M8 16h8"/></svg>workout
+  </button>
+  <button class="nav-tab" onclick="switchView('recipes',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>recipes
+  </button>
+  <button class="nav-tab" onclick="switchView('shopping',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>shop
+  </button>
+  <button class="nav-tab" onclick="switchView('progress',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>progress
+  </button>
+</nav>
+
+<div class="modal-overlay" id="rec-modal" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+const DSHORT = ['sun','mon','tue','wed','thu','fri','sat'];
+
+const SUPPLEMENTS = [
+  {timing:'with first meal',       items:'creatine 5g · vitamin D3 1000 IU'},
+  {timing:'with dinner',           items:'omega-3 2g EPA/DHA'},
+  {timing:'before bed · optional', items:'magnesium glycinate 300mg'}
+];
+
+const MEAL_PLAN = {
+  sunday:    { type:'prefaste', note:'last meal before 8pm — fast starts tonight', meals:[
+    {type:'breakfast',name:'overnight oats',desc:'oats, mixed berries, flaxseeds, almond milk',recipe:'overnight-oats'},
+    {type:'lunch',name:'smoked mackerel salad',desc:'smoked mackerel, leafy greens, avocado, olive oil & lemon',recipe:'mackerel-salad'},
+    {type:'dinner',name:'chicken thighs & quinoa',desc:'grilled chicken thighs, roasted veg, quinoa — finish before 8pm',recipe:'chicken-quinoa'}
+  ], snacks:[
+    {time:'10:30am',name:'walnuts & dark chocolate',desc:'30g walnuts · 2–3 squares 70%+ dark choc',recipe:'walnuts-dark-choc'},
+    {time:'3:30pm',name:'cottage cheese bowl',desc:'150g cottage cheese · cucumber · cherry tomatoes',recipe:'cottage-cheese-bowl'}
+  ]},
+  monday:    { type:'fast', note:'36h fast — water, black coffee, herbal tea only', meals:[] },
+  tuesday:   { type:'refeed', note:'break fast at 8am — high protein to rebuild', meals:[
+    {type:'break fast · 8am',name:'eggs, salmon & avocado',desc:'3 scrambled eggs, smoked salmon, half avocado, baby spinach',recipe:'refeed-breakfast'},
+    {type:'lunch',name:'red lentil soup',desc:'red lentils, cumin, turmeric, garlic, wholegrain bread',recipe:'lentil-soup'},
+    {type:'dinner',name:'baked salmon',desc:'salmon fillet, steamed broccoli, brown rice',recipe:'baked-salmon'}
+  ], snacks:[
+    {time:'11am · post-workout',name:'protein shake',desc:'1 scoop protein · 250ml almond milk · recovery',recipe:'protein-shake'},
+    {time:'3:30pm',name:'hard-boiled eggs',desc:'2–3 eggs · salt, pepper',recipe:'boiled-eggs'}
+  ]},
+  wednesday: { type:'normal', meals:[
+    {type:'breakfast',name:'greek yogurt bowl',desc:'full-fat greek yogurt, walnuts, banana, honey, chia seeds',recipe:'yogurt-bowl'},
+    {type:'lunch',name:'tuna & chickpea salad',desc:'tuna, chickpeas, cherry tomatoes, cucumber, olive oil',recipe:'tuna-chickpea'},
+    {type:'dinner',name:'chicken stir-fry',desc:'chicken breast, mixed veg, ginger, soy sauce, soba noodles',recipe:'chicken-stirfry'}
+  ], snacks:[
+    {time:'10:30am',name:'smoked salmon & cucumber bites',desc:'80g smoked salmon · cucumber rounds · cottage cheese',recipe:'salmon-cucumber'},
+    {time:'3:30pm',name:'almond butter & celery',desc:'3–4 celery stalks · 2 tbsp almond butter',recipe:'almond-celery'}
+  ]},
+  thursday:  { type:'normal', meals:[
+    {type:'breakfast',name:'oat porridge',desc:'rolled oats, blueberries, chia seeds, almond milk, cinnamon',recipe:'oat-porridge'},
+    {type:'lunch',name:'sardines on rye',desc:'sardines in olive oil, rye toast, cucumber, tomato, lemon',recipe:'sardines-rye'},
+    {type:'dinner',name:'lean beef bowl',desc:'lean beef strips, roasted sweet potato, green beans',recipe:'beef-bowl'}
+  ], snacks:[
+    {time:'10:30am',name:'cottage cheese bowl',desc:'150g cottage cheese · cucumber · cherry tomatoes',recipe:'cottage-cheese-bowl'},
+    {time:'3:30pm · post-workout',name:'protein shake',desc:'1 scoop protein · 250ml almond milk',recipe:'protein-shake'}
+  ]},
+  friday:    { type:'normal', meals:[
+    {type:'breakfast',name:'eggs & avocado toast',desc:'2 boiled eggs, wholegrain toast, mashed avocado, chilli flakes',recipe:'egg-avocado'},
+    {type:'lunch',name:'chickpea spinach curry',desc:'chickpeas, spinach, coconut milk, spices, brown rice',recipe:'chickpea-curry'},
+    {type:'dinner',name:'mackerel & mediterranean veg',desc:'pan-seared mackerel, roasted courgette, peppers, tomatoes',recipe:'mackerel-veg'}
+  ], snacks:[
+    {time:'10:30am',name:'walnuts & dark chocolate',desc:'30g walnuts · 2–3 squares 70%+ dark choc',recipe:'walnuts-dark-choc'},
+    {time:'3:30pm',name:'hard-boiled eggs',desc:'2–3 eggs · salt, pepper',recipe:'boiled-eggs'}
+  ]},
+  saturday:  { type:'normal', meals:[
+    {type:'breakfast · pre-workout',name:'protein smoothie',desc:'oats, banana, almond butter, milk — higher carb pre-workout',recipe:'protein-smoothie'},
+    {type:'lunch',name:'chicken hummus wrap',desc:'grilled chicken, hummus, mixed salad, wholegrain wrap',recipe:'chicken-wrap'},
+    {type:'dinner',name:'prawn stir-fry',desc:'king prawns, mixed veg, garlic, sesame oil, brown rice',recipe:'prawn-stirfry'}
+  ], snacks:[
+    {time:'11am · post-workout',name:'protein shake',desc:'1 scoop protein · 250ml almond milk · recovery',recipe:'protein-shake'},
+    {time:'3:30pm',name:'crispy roasted chickpeas',desc:'batch cook · high fibre · plant protein',recipe:'roasted-chickpeas'}
+  ]}
+};
+
+const WO_PLAN = {
+  sunday:    {type:'mobility', label:'walk + corrective',             color:'var(--blue)',  note:'light day before fast'},
+  monday:    {type:'rest',     label:'rest',                          color:'var(--muted)', note:'fast day — walk if comfortable'},
+  tuesday:   {type:'strength', session:'A', label:'session A — upper pull & press', color:'var(--green)', note:'after the walk · ~18 min · wait 1–2h after breaking fast'},
+  wednesday: {type:'mobility', label:'corrective mobility',           color:'var(--blue)',  note:'japanese walk + corrective protocol'},
+  thursday:  {type:'strength', session:'B', label:'session B — asymmetric pull',    color:'var(--green)', note:'after the walk · ~18 min · dumbbells'},
+  friday:    {type:'walk',     label:'walk only',                     color:'var(--muted)', note:'active recovery'},
+  saturday:  {type:'strength', session:'C', label:'session C — legs & corrective',  color:'var(--green)', note:'after the walk · ~18 min · dumbbells'}
+};
+
+const WORKOUTS = {
+  A: {
+    name:'session A — upper pull & press',
+    focus:'right upper back · rear delts · controlled push',
+    warmup:[
+      {name:'short-foot drill — left only', dur:'2 × 10 reps · barefoot', note:'stand barefoot. press your left big toe firmly into the floor, then draw the arch up without curling your toes. hold 5 seconds each rep. wakes up the left arch before you load it.'},
+      {name:'90/90 breathing reset', dur:'5 slow breath cycles', note:'lie on back, knees bent. inhale slowly through the nose into your lower ribs — feel the left side of your ribcage expand. exhale fully through the mouth. this sets your breathing pattern for the whole session.'}
+    ],
+    exercises:[
+      {name:'single-arm row — right priority',  setsLabel:'4R / 3L', repsLabel:'10R · 12L', rest:'60s', tempo:'1-1-3', breathe:'exhale on pull · inhale on lower', asymmetric:true,
+       side:'right: your heavier dumbbell — this is the priority side. left: 20–30% lighter, more reps, focus on feel not load.',
+       tip:'hand and knee on a surface. pull elbow to ceiling. pause at top — feel right mid-back squeeze before releasing. do not let your bicep take over.'},
+      {name:'rear delt flye',                   setsLabel:'3×15',    repsLabel:'',          rest:'45s', tempo:'2-0-3', breathe:'exhale as arms rise · inhale as they lower',
+       tip:'hinge forward 45°. arms hang straight down. raise out to the sides — stop at shoulder height, no higher. very light weight. right rear delt is the target.'},
+      {name:'bird-dog row — left arm',          setsLabel:'3×10',    repsLabel:'left only', rest:'45s', tempo:'2-1-3', breathe:'exhale on pull · inhale on return',
+       side:'left arm only. right hand stays planted on the floor for stability. trains left mid-back under anti-rotation demand.',
+       tip:'on hands and knees. extend right leg back for balance. row left dumbbell to hip — keep hips perfectly square, zero rotation. pause 1 second at the top.'},
+      {name:'dumbbell floor press',             setsLabel:'2×12',    repsLabel:'',          rest:'60s', tempo:'3-1-1', breathe:'inhale on lower · exhale on press',
+       tip:'flat on the floor. lower dumbbells until elbows touch the floor — that is your range limiter. press back to lockout. maintenance volume only — do not push for a personal best here.'}
+    ]
+  },
+  B: {
+    name:'session B — asymmetric pull',
+    focus:'right lats · biceps · Pallof anti-rotation',
+    warmup:[
+      {name:'hip airplane — left leg only', dur:'2 × 8 reps', note:'stand on left leg, slight hip hinge. keep left foot arch lifted. slowly rotate your torso open like a propeller — then close. feel the left glute working to hold you steady.'},
+      {name:'dead bug — left-side bias', dur:'2 × 8 each side', note:'lie on back. lower back pressed to floor. move slowly. exhale fully as you extend each arm/leg. left side: pause 1 extra second at the extended position.'}
+    ],
+    exercises:[
+      {name:'bent-over row — asymmetric',       setsLabel:'3 each',  repsLabel:'10R · 12L', rest:'60s', tempo:'1-1-3', breathe:'exhale on row · inhale on lower', asymmetric:true,
+       side:'right: heavier — your priority side. left: lighter, higher reps. left arm is active recovery volume, not a growth set.',
+       tip:'hinge at hips, back flat, soft knees. row to hip, brief pause at top. right side pulls from mid-back — not the bicep.'},
+      {name:'dumbbell bicep curl',               setsLabel:'3×12',    repsLabel:'',          rest:'45s', tempo:'2-1-3', breathe:'exhale on curl · inhale on lower',
+       tip:'supinate fully at the top — rotate wrist so palm faces ceiling completely. squeeze 1 second. slow controlled descent. both arms equal weight.'},
+      {name:'rear delt flye',                   setsLabel:'3×15',    repsLabel:'',          rest:'45s', tempo:'2-0-3', breathe:'exhale up · inhale down',
+       tip:'hinge 45°, arms hang. raise out to sides. if you feel only your biceps, go lighter and lead with the elbow, not the hand.'},
+      {name:'Pallof press',                     setsLabel:'3 each',  repsLabel:'10 + 2L',   rest:'45s', tempo:'hold 2s extended', breathe:'exhale on press · inhale on return',
+       side:'left side: 2 extra reps per set. goal is left-core anti-rotation. resist being pulled toward the anchor.',
+       tip:'anchor a resistance band at chest height. stand perpendicular. press straight out, hold 2 seconds, return. do not let your torso rotate. no band: hold a dumbbell at chest and resist rotating as you press it out slowly.'}
+    ]
+  },
+  C: {
+    name:'session C — legs & left corrective',
+    focus:'left quad · left glute · anti-rotation core',
+    warmup:[
+      {name:'short-foot drill — left only', dur:'2 × 10 reps · barefoot', note:'most important activation before any leg session. press left big toe into floor, lift arch without curling toes. hold 5 seconds each rep. wakes up the left arch so it does its job under load.'},
+      {name:'hip airplane — left leg only', dur:'2 × 8 reps', note:'stand on left leg. hinge forward at the hip, keep short-foot active. slowly rotate torso open and closed. do not rush. feel the left glute stabilise you throughout.'}
+    ],
+    exercises:[
+      {name:'goblet squat',                         setsLabel:'3×12',    repsLabel:'',          rest:'60s', tempo:'3-1-1', breathe:'inhale on descent · exhale driving up',
+       side:'focus: left knee tracks over left big toe throughout. left arch stays lifted — do not let it collapse at the bottom of the squat.',
+       tip:'hold dumbbell at chest. squat deep, both knees out over toes. at the very top, add a deliberate left glute squeeze — hold 1 second. most people skip this on the left side. do not.'},
+      {name:'reverse lunge — left extra',           setsLabel:'3R / 4L', repsLabel:'10 each',   rest:'60s', tempo:'3-1-1', breathe:'inhale on lower · exhale driving up', asymmetric:true,
+       side:'left leg does 4 sets. right leg does 3. left is your corrective side — more volume here is intentional.',
+       tip:'step back, not forward — reverse lunge is kinder on the knee. left leg: push hard through the heel as you drive back up. feel left quad and glute working together, not just the quad.'},
+      {name:'single-leg glute bridge — L priority', setsLabel:'3R / 4L', repsLabel:'10R · 12L', rest:'60s', tempo:'2-2-1', breathe:'exhale driving hips up · inhale on lower', asymmetric:true,
+       side:'left leg: 4 sets, 12 reps, hold 2 seconds at top. this is the main corrective lift of the entire programme. left glute is chronically under-firing.',
+       tip:'shoulders on sofa or bench edge. drive through working leg heel. at the very top: hard left glute squeeze, hold 2 seconds. if you feel it only in your hamstring, drive the heel harder into the floor.'},
+      {name:'Pallof press',                         setsLabel:'3 each',  repsLabel:'10 + 2L',   rest:'45s', tempo:'hold 2s extended', breathe:'exhale on press · inhale on return',
+       side:'left side: 2 extra reps. trains the left core stabilisers that your lower-body asymmetry has been bypassing.',
+       tip:'anchor band at chest height. stand sideways. press straight out, resist the rotation pull, hold 2 seconds. the challenge is not the press — it is staying perfectly still while the band tries to pull you.'}
+    ]
+  }
+};
+
+const MOBILITY = [
+  {name:'90/90 breathing reset',         dur:'5 breath cycles · start here',   note:'lie on back, knees bent. inhale slowly into lower ribs — feel left side expand. exhale fully. this is the foundation of the corrective work. do not skip it.'},
+  {name:'short-foot drill — left only',  dur:'2 × 10 reps · barefoot',         note:'press left big toe down, lift arch without curling toes. hold 5 seconds each rep. strengthens the left arch you rely on all day.'},
+  {name:'cat-camel',                     dur:'10 slow reps',                   note:'on hands and knees. full arch up, full arch down. breathe into each position — inhale on arch, exhale on round. no rushing.'},
+  {name:'open book — thoracic rotation', dur:'8 each side',                    note:'side-lying, knees stacked. top arm sweeps open across the body. follow it with your eyes. right side especially — open that tight right upper back.'},
+  {name:'hip airplane — left leg only',  dur:'2 × 8 reps',                    note:'stand on left leg, hinge at hip. rotate torso open and closed like a propeller. slow. trains left glute under real balance demand.'},
+  {name:'dead bug',                      dur:'2 × 8 each side · left extra',   note:'slow. lower back stays pinned. exhale fully on each rep. left side: 2 extra reps and slower tempo than the right.'},
+  {name:'Pallof press hold',             dur:'3 × 10s each side · left extra', note:'anchor band at chest height. press out and hold 10 seconds. left side: 2 extra reps. trains the left core anti-rotation pattern.'},
+  {name:'wall slides',                   dur:'10 slow reps',                   note:'back against wall, arms at 90°. slide arms up overhead — elbows and wrists stay on the wall throughout. opens tight lats and thoracic spine.'},
+  {name:'pigeon pose (or figure-4)',     dur:'60s each side',                  note:'deep hip opener. if pigeon is too intense, figure-4 on your back targets the same muscles with less knee stress.'}
+];
+
+const RECIPES = {
+  'overnight-oats':   { title:'overnight oats',            time:'5 min prep',        tags:['high-fibre','cholesterol-friendly'], ingr:['80g rolled oats','200ml almond milk','1 tbsp flaxseeds','large handful of mixed berries','1 tsp honey'], steps:['Mix oats and almond milk in a jar.','Stir in flaxseeds.','Top with berries and honey.','Cover and refrigerate overnight. eat cold.'] },
+  'yogurt-bowl':      { title:'greek yogurt bowl',         time:'5 min',             tags:['probiotic','high-protein'],          ingr:['200g full-fat greek yogurt','1 banana, sliced','small handful of walnuts','1 tbsp chia seeds','1 tsp honey'], steps:['Spoon yogurt into bowl.','Top with banana, walnuts, chia seeds.','Drizzle honey. done.'] },
+  'oat-porridge':     { title:'oat porridge',              time:'5 min',             tags:['high-fibre','cholesterol-friendly'], ingr:['80g rolled oats','300ml almond milk','1 tbsp chia seeds','handful of blueberries','pinch of cinnamon','1 tsp honey'], steps:['Heat oats and almond milk in pan 4–5 min stirring.','Stir in chia seeds and cinnamon.','Pour into bowl, top with blueberries and honey.'] },
+  'egg-avocado':      { title:'eggs & avocado toast',      time:'10 min',            tags:['high-protein','healthy-fats'],       ingr:['2 eggs','2 slices wholegrain bread','1 ripe avocado','chilli flakes','salt, pepper','juice of ¼ lemon'], steps:['Boil eggs 7 min (jammy) or 9 min (hard). cool in cold water.','Toast bread.','Mash avocado with lemon, salt, pepper. spread on toast.','Halve eggs and place on top. sprinkle chilli flakes.'] },
+  'protein-smoothie': { title:'protein smoothie',          time:'5 min',             tags:['high-protein','pre-workout'],        ingr:['1 scoop protein powder','80g rolled oats','1 ripe banana','1 tbsp almond butter','300ml milk (any)','pinch of cinnamon'], steps:['Add everything to a blender.','Blend 30 seconds until smooth.','Drink immediately.'] },
+  'refeed-breakfast': { title:'re-feed: eggs & salmon',    time:'10 min',            tags:['re-feed','high-protein','omega-3'],  ingr:['3 large eggs','80g smoked salmon','½ avocado','handful of baby spinach','1 tsp butter','salt, black pepper, chilli flakes'], steps:['Heat butter in pan on low. crack in eggs.','Stir gently and slowly — pull from heat while slightly underdone.','Plate alongside smoked salmon, sliced avocado, and spinach.','Season. eat slowly — your first meal after 36 hours.'] },
+  'mackerel-salad':   { title:'smoked mackerel salad',     time:'10 min',            tags:['omega-3','cholesterol-friendly'],    ingr:['2 smoked mackerel fillets','80g mixed leafy greens','½ avocado, sliced','10 cherry tomatoes','1 tbsp olive oil','juice of ½ lemon','salt and black pepper'], steps:['Flake mackerel into large chunks over the salad base.','Add avocado and tomatoes.','Drizzle olive oil and lemon juice. season and toss.'] },
+  'chicken-quinoa':   { title:'chicken thighs & quinoa',   time:'25 min',            tags:['high-protein','balanced'],           ingr:['2 chicken thighs','80g quinoa','1 courgette','1 bell pepper','1 tbsp olive oil','1 tsp mixed herbs','salt, pepper, garlic powder'], steps:['Cook quinoa per packet (15 min).','Slice veg, toss with olive oil, herbs, salt. roast 200°C 20 min or pan-fry 10 min.','Season chicken. grill or pan-fry 6–7 min each side.','Serve together.'] },
+  'lentil-soup':      { title:'red lentil soup',           time:'20 min',            tags:['high-fibre','cholesterol-friendly'], ingr:['150g red lentils','1 onion, diced','2 cloves garlic','1 tsp cumin','1 tsp turmeric','400ml vegetable stock','1 tbsp olive oil','1 slice wholegrain bread'], steps:['Heat olive oil. soften onion 5 min, add garlic and spices 1 min.','Add lentils and stock. simmer 15 min until soft.','Blend half for a thicker texture. season.','Serve with wholegrain bread.'] },
+  'baked-salmon':     { title:'baked salmon',              time:'20 min',            tags:['omega-3','high-protein'],            ingr:['1 salmon fillet (150–180g)','80g brown rice','200g broccoli','1 lemon','1 tsp olive oil','salt, pepper, dried dill'], steps:['Preheat oven 200°C. start brown rice.','Place salmon on tray. drizzle olive oil, season. bake 15 min.','Steam broccoli 5 min.','Serve with lemon wedges.'] },
+  'tuna-chickpea':    { title:'tuna & chickpea salad',     time:'10 min',            tags:['high-protein','cholesterol-friendly'],ingr:['1 tin tuna in spring water, drained','½ tin chickpeas, drained','10 cherry tomatoes, halved','½ cucumber, diced','1 tbsp olive oil','juice of ½ lemon','salt, pepper, parsley'], steps:['Drain tuna and chickpeas.','Combine with tomatoes and cucumber.','Dress with olive oil and lemon. season and toss.'] },
+  'chicken-stirfry':  { title:'chicken stir-fry',          time:'20 min',            tags:['high-protein','quick'],              ingr:['1 chicken breast, sliced thin','150g soba noodles','1 bell pepper, sliced','1 courgette, sliced','2 cloves garlic','1 tsp fresh ginger, grated','2 tbsp low-sodium soy sauce','1 tsp sesame oil'], steps:['Cook noodles per packet. drain.','Heat sesame oil. stir-fry chicken 5 min.','Add veg, garlic, ginger. stir-fry 4 min.','Add noodles and soy sauce. toss. serve.'] },
+  'sardines-rye':     { title:'sardines on rye',           time:'5 min',             tags:['omega-3','cholesterol-friendly'],    ingr:['1 tin sardines in olive oil','2 slices rye bread','½ cucumber, sliced','1 tomato, sliced','juice of ½ lemon','black pepper, dill'], steps:['Toast rye bread.','Top with sardines, cucumber, and tomato.','Squeeze lemon. season with pepper. serve.'] },
+  'beef-bowl':        { title:'lean beef bowl',            time:'25 min',            tags:['high-protein','iron-rich'],          ingr:['150g lean beef strips','1 sweet potato, cubed','150g green beans','1 tbsp olive oil','1 tsp paprika','salt, pepper, garlic powder'], steps:['Toss sweet potato in olive oil, paprika, salt. roast 200°C 20 min.','Season beef. sear in hot pan 3–4 min. rest 2 min.','Steam green beans 5 min.','Serve together.'] },
+  'chickpea-curry':   { title:'chickpea spinach curry',    time:'20 min',            tags:['high-fibre','cholesterol-friendly'], ingr:['1 tin chickpeas, drained','80g baby spinach','1 tin light coconut milk','1 tin chopped tomatoes','1 onion','2 cloves garlic','1 tsp each: cumin, turmeric, garam masala','80g brown rice'], steps:['Cook rice per packet.','Fry onion 5 min. add garlic and spices 1 min.','Add tomatoes and coconut milk. simmer 5 min.','Add chickpeas and spinach. stir until wilted. season.','Serve over rice.'] },
+  'mackerel-veg':     { title:'mackerel & mediterranean veg', time:'25 min',         tags:['omega-3','cholesterol-friendly'],    ingr:['2 mackerel fillets','1 courgette, sliced','1 red pepper, diced','10 cherry tomatoes','2 cloves garlic','1 tbsp olive oil','salt, pepper, dried oregano'], steps:['Toss veg with olive oil, garlic, oregano. roast 200°C 20 min.','Score mackerel skin. season both sides.','Pan-sear skin-side down 4 min until crispy. flip 2 min.','Serve mackerel over roasted veg.'] },
+  'chicken-wrap':     { title:'chicken hummus wrap',       time:'15 min',            tags:['high-protein','balanced'],           ingr:['1 chicken breast','1 wholegrain wrap','2 tbsp hummus','mixed salad leaves','½ cucumber, sliced','5 cherry tomatoes','salt, pepper, paprika'], steps:['Season chicken with paprika, salt, pepper. pan-fry 6–7 min each side. rest, slice thin.','Spread hummus on wrap.','Layer salad, cucumber, tomatoes, and chicken.','Fold and slice in half.'] },
+  'prawn-stirfry':    { title:'prawn stir-fry',            time:'15 min',            tags:['high-protein','low-fat','quick'],    ingr:['200g king prawns','80g brown rice','1 bell pepper, sliced','1 courgette, sliced','2 cloves garlic','1 tbsp olive oil','2 tbsp low-sodium soy sauce','1 tsp sesame oil','chilli flakes'], steps:['Cook rice per packet.','Heat olive oil. stir-fry veg and garlic 4 min.','Add prawns. cook 3–4 min until pink.','Add soy sauce and sesame oil. toss. serve over rice.'] },
+  'protein-shake':       { title:'protein shake',                  time:'3 min',                  tags:['high-protein','post-workout'],         ingr:['1 scoop protein powder','250ml almond milk or water','handful of ice','optional: ½ tsp almond butter'], steps:['Add everything to a shaker or blender.','Shake or blend 20 seconds.','Drink within 30–45 min of training for best recovery.'] },
+  'boiled-eggs':         { title:'hard-boiled eggs',               time:'10 min',                 tags:['high-protein','zero-carb'],            ingr:['2–3 eggs','pinch of salt and black pepper','optional: paprika or chilli flakes'], steps:['Bring water to a boil. lower eggs in gently.','Cook 9 min for hard, 7 min for jammy yolk.','Transfer to cold water 2 min. peel and season.','Batch cook 4–6 at a time — keeps 5 days in the fridge.'] },
+  'salmon-cucumber':     { title:'smoked salmon & cucumber bites', time:'5 min',                  tags:['omega-3','zero-carb','high-protein'],   ingr:['80g smoked salmon, torn into pieces','½ cucumber, sliced into thick rounds','1 tbsp cottage cheese','black pepper, dill, squeeze of lemon'], steps:['Slice cucumber into thick rounds.','Top each with a small amount of cottage cheese.','Lay a piece of salmon on top. finish with dill and lemon.'] },
+  'walnuts-dark-choc':   { title:'walnuts & dark chocolate',       time:'0 min',                  tags:['omega-3','cholesterol-friendly'],       ingr:['30g walnuts (a small closed handful)','2–3 squares dark chocolate (70%+ cocoa)'], steps:['Portion out the walnuts.','Pair with 2–3 squares of dark chocolate (70% minimum — keeps sugar low).','The fat and fibre in both holds you for 2–3 hours.'] },
+  'cottage-cheese-bowl': { title:'cottage cheese bowl',            time:'5 min',                  tags:['high-protein','low-carb'],              ingr:['150g low-fat cottage cheese','½ cucumber, diced','5 cherry tomatoes, halved','salt, black pepper','fresh chives or dill — optional'], steps:['Spoon cottage cheese into a bowl.','Add cucumber and tomatoes.','Season well. eat cold.'] },
+  'almond-celery':       { title:'almond butter & celery',         time:'2 min',                  tags:['healthy-fats','high-fibre','low-carb'],  ingr:['3–4 stalks of celery','2 tbsp almond butter'], steps:['Cut celery into sticks.','Fill the groove or dip into almond butter.','The fibre and fat together are surprisingly satiating.'] },
+  'roasted-chickpeas':   { title:'crispy roasted chickpeas',       time:'30 min (batch)',         tags:['high-fibre','plant-protein'],           ingr:['1 tin chickpeas, drained','1 tbsp olive oil','1 tsp paprika','½ tsp cumin','½ tsp garlic powder','salt'], steps:['Preheat oven 200°C. pat chickpeas very dry with kitchen paper — moisture is the enemy of crunch.','Toss with olive oil and spices.','Spread on tray, single layer. roast 25–30 min, shake halfway.','Cool completely before storing. they crisp up as they cool. keeps 3 days.'] },
+  'choc-protein-mousse': { title:'chocolate protein mousse',       time:'5 min + 20 min chill',   tags:['high-protein','low-sugar'],             ingr:['1 scoop chocolate protein powder','200g full-fat greek yogurt','1 tbsp unsweetened cocoa powder','1 tsp honey','splash of almond milk to loosen'], steps:['Mix protein powder and cocoa into the yogurt.','Add honey and a splash of almond milk. stir to a mousse consistency.','Taste and adjust sweetness.','Chill 20 min for a thicker set, or eat straight away.'] },
+  'chia-pudding':        { title:'vanilla chia pudding',           time:'5 min prep + overnight', tags:['high-fibre','omega-3'],                 ingr:['3 tbsp chia seeds','200ml almond milk','½ tsp vanilla extract','1 tsp honey','handful of berries to serve'], steps:['Mix chia seeds, almond milk, vanilla, and honey in a jar.','Stir well — break up any clumps. stir again after 10 min.','Refrigerate overnight (or at least 4 hours).','Top with berries before eating.'] },
+  'banana-nice-cream':   { title:'banana protein nice cream',      time:'5 min + freeze overnight',tags:['high-protein','natural-sweetness'],    ingr:['2 ripe bananas, sliced and frozen','1 scoop vanilla protein powder','2 tbsp almond milk','optional: 1 tsp almond butter'], steps:['Freeze banana slices overnight.','Blend frozen banana, protein powder, and almond milk.','Scrape down sides, blend again until smooth and creamy.','Eat immediately for soft-serve. refreeze 30 min for a firmer scoop.'] },
+  'protein-balls':       { title:'no-bake protein balls',          time:'15 min + 30 min chill',  tags:['high-protein','meal-prep','portable'],  ingr:['80g rolled oats','2 scoops protein powder','4 tbsp almond butter','2 tbsp honey','2 tbsp dark chocolate chips (70%+)','1 tbsp chia seeds','2–3 tbsp almond milk to bind'], steps:['Mix oats, protein powder, and chia seeds in a bowl.','Add almond butter and honey. mix well.','Add almond milk one tbsp at a time until mixture holds together when pressed.','Fold in chocolate chips. roll into 10–12 balls. refrigerate 30 min. keeps 5 days.'] },
+  'yogurt-bark':         { title:'frozen yogurt bark',             time:'5 min + freeze 3h',      tags:['probiotic','antioxidant','low-effort'], ingr:['300g full-fat greek yogurt','1 tbsp honey','large handful of mixed berries','2 tbsp dark chocolate chips (70%+)','1 tbsp crushed walnuts or chia seeds'], steps:['Mix yogurt and honey. spread on a lined baking tray about 1cm thick.','Scatter berries, chocolate chips, and walnuts across the top.','Freeze at least 3 hours or overnight.','Break into shards from the freezer. keeps 2 weeks.'] }
+};
+
+const SHOPPING = {
+  'protein & fish': [
+    {id:'s01',name:'eggs',qty:'1 dozen'},{id:'s02',name:'smoked salmon',qty:'200g'},{id:'s03',name:'salmon fillets',qty:'2 fillets'},
+    {id:'s04',name:'smoked mackerel fillets',qty:'2 packs'},{id:'s05',name:'mackerel fillets (fresh)',qty:'2 fillets'},
+    {id:'s06',name:'chicken thighs',qty:'400g'},{id:'s07',name:'chicken breast',qty:'3 pieces'},
+    {id:'s08',name:'lean beef strips (sirloin)',qty:'300g'},{id:'s09',name:'king prawns',qty:'200g'},
+    {id:'s10',name:'sardines in olive oil (tin)',qty:'1 tin'},{id:'s11',name:'tuna in spring water (tin)',qty:'1 tin'}
+  ],
+  'snacks & supplements': [
+    {id:'x01',name:'protein powder',qty:'(you have this)'},
+    {id:'x02',name:'cottage cheese (low-fat)',qty:'400g'},
+    {id:'x03',name:'celery',qty:'1 bunch'},
+    {id:'x04',name:'dark chocolate (70%+ cocoa)',qty:'100g bar'},
+    {id:'x05',name:'creatine monohydrate',qty:'(check stock)'},
+    {id:'x06',name:'omega-3 fish oil (2g EPA/DHA)',qty:'(check stock)'},
+    {id:'x07',name:'vitamin D3 1000 IU',qty:'(check stock)'},
+    {id:'x08',name:'magnesium glycinate 300mg',qty:'optional'}
+  ],
+  'dairy & fats': [
+    {id:'d01',name:'full-fat greek yogurt',qty:'500g'},{id:'d02',name:'butter',qty:'small pack'},
+    {id:'d03',name:'almond butter',qty:'1 jar'},{id:'d04',name:'milk (any)',qty:'500ml'}
+  ],
+  'produce': [
+    {id:'p01',name:'avocados',qty:'3'},{id:'p02',name:'bananas',qty:'4'},{id:'p03',name:'mixed berries (or frozen)',qty:'300g'},
+    {id:'p04',name:'blueberries',qty:'150g'},{id:'p05',name:'cherry tomatoes',qty:'400g'},{id:'p06',name:'cucumber',qty:'2'},
+    {id:'p07',name:'bell peppers (mixed)',qty:'4'},{id:'p08',name:'courgettes',qty:'3'},{id:'p09',name:'broccoli',qty:'1 head'},
+    {id:'p10',name:'baby spinach',qty:'200g'},{id:'p11',name:'mixed leafy greens',qty:'150g'},{id:'p12',name:'sweet potato',qty:'2'},
+    {id:'p13',name:'green beans',qty:'200g'},{id:'p14',name:'onions',qty:'3'},{id:'p15',name:'garlic',qty:'1 bulb'},
+    {id:'p16',name:'fresh ginger',qty:'small piece'},{id:'p17',name:'lemons',qty:'3'},{id:'p18',name:'tomato (large)',qty:'2'}
+  ],
+  'grains & legumes': [
+    {id:'g01',name:'rolled oats',qty:'500g'},{id:'g02',name:'brown rice',qty:'500g'},{id:'g03',name:'quinoa',qty:'200g'},
+    {id:'g04',name:'soba noodles',qty:'200g'},{id:'g05',name:'rye bread',qty:'1 loaf'},{id:'g06',name:'wholegrain bread',qty:'1 loaf'},
+    {id:'g07',name:'wholegrain wraps',qty:'1 pack'},{id:'g08',name:'red lentils',qty:'200g'},{id:'g09',name:'chickpeas (tin)',qty:'2 tins'}
+  ],
+  'pantry': [
+    {id:'n01',name:'olive oil (extra virgin)',qty:'1 bottle'},{id:'n02',name:'sesame oil',qty:'small bottle'},
+    {id:'n03',name:'low-sodium soy sauce',qty:'1 bottle'},{id:'n04',name:'coconut milk, light (tin)',qty:'1 tin'},
+    {id:'n05',name:'chopped tomatoes (tin)',qty:'1 tin'},{id:'n06',name:'vegetable stock',qty:'1 litre'},
+    {id:'n07',name:'almond milk',qty:'1 litre'},{id:'n08',name:'hummus',qty:'200g tub'},
+    {id:'n09',name:'walnuts',qty:'100g'},{id:'n10',name:'chia seeds',qty:'200g'},{id:'n11',name:'flaxseeds',qty:'200g'},
+    {id:'n12',name:'honey',qty:'small jar'},{id:'n13',name:'unsweetened cocoa powder',qty:'small tin'},
+    {id:'n14',name:'dark chocolate chips (70%+)',qty:'100g'},{id:'n15',name:'vanilla extract',qty:'small bottle'}
+  ],
+  'spices': [
+    {id:'sp1',name:'cumin',qty:''},{id:'sp2',name:'turmeric',qty:''},{id:'sp3',name:'garam masala',qty:''},
+    {id:'sp4',name:'paprika',qty:''},{id:'sp5',name:'mixed herbs',qty:''},{id:'sp6',name:'dried oregano',qty:''},
+    {id:'sp7',name:'cinnamon',qty:''},{id:'sp8',name:'chilli flakes',qty:''},{id:'sp9',name:'dill (dried)',qty:''}
+  ]
+};
+
+const BFAST_IDS   = ['overnight-oats','yogurt-bowl','oat-porridge','egg-avocado','protein-smoothie','refeed-breakfast'];
+const SNACK_IDS   = ['protein-shake','boiled-eggs','salmon-cucumber','walnuts-dark-choc','cottage-cheese-bowl','almond-celery','roasted-chickpeas'];
+const DESSERT_IDS = ['choc-protein-mousse','chia-pudding','banana-nice-cream','protein-balls','yogurt-bark'];
+const CAT_COLORS  = { breakfast:'var(--blue)', 'lunch & dinner':'var(--green)', snacks:'var(--purple)', desserts:'var(--pink)' };
+
+function recCat(id) {
+  if (BFAST_IDS.includes(id))   return 'breakfast';
+  if (SNACK_IDS.includes(id))   return 'snacks';
+  if (DESSERT_IDS.includes(id)) return 'desserts';
+  return 'lunch & dinner';
+}
+
+const gs = k => { try { const v = localStorage.getItem('hplan_'+k); return v ? JSON.parse(v) : null; } catch(e) { return null; } };
+const ss = (k,v) => { try { localStorage.setItem('hplan_'+k, JSON.stringify(v)); } catch(e) {} };
+
+const TODAY  = DAYS[new Date().getDay()];
+let selDay   = TODAY;
+let selWoDay = TODAY;
+
+function init() {
+  const now = new Date();
+  const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
+  const we = new Date(ws); we.setDate(ws.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('en-GB', {day:'numeric',month:'short'});
+  document.getElementById('hdr-week').textContent = fmt(ws) + ' – ' + fmt(we);
+  renderDayStrip(); renderDayContent(selDay);
+  renderWoDayStrip(); renderWorkout(); renderRecipes(); renderShopping(); renderProgress();
+}
+
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'progress') setTimeout(() => drawChart(gs('progress_log') || []), 60);
+}
+
+// ── week view ──
+function renderDayStrip() {
+  const now = new Date();
+  const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
+  document.getElementById('day-strip').innerHTML = DAYS.map((day,i) => {
+    const d = new Date(ws); d.setDate(ws.getDate()+i);
+    const plan = MEAL_PLAN[day];
+    const isFast = plan.type === 'fast', isSel = day === selDay, isToday = day === TODAY;
+    const hasMeals = plan.meals && plan.meals.length > 0;
+    let cls = 'day-btn';
+    if (isSel) cls += ' active';
+    if (isFast) cls += ' fast-day';
+    if (isToday && !isSel) cls += ' is-today';
+    return `<button class="${cls}" onclick="selectDay('${day}')">
+      <span class="day-dname">${DSHORT[i]}</span>
+      <span class="day-dnum">${d.getDate()}</span>
+      <span class="day-dot" style="${!hasMeals?'opacity:0':''}"></span>
+    </button>`;
+  }).join('');
+}
+
+function selectDay(day) { selDay = day; renderDayStrip(); renderDayContent(day); }
+
+function renderDayContent(day) {
+  const plan = MEAL_PLAN[day], wo = WO_PLAN[day];
+  let h = '';
+  if (wo) h += `<div class="wo-badge" style="color:${wo.color}"><span class="wo-dot" style="background:${wo.color}"></span>${wo.label}<span class="wo-note"> — ${wo.note}</span></div>`;
+  if (plan.type === 'fast') {
+    h += `<div class="fast-banner"><div class="fast-title">36h fast</div><div class="fast-note">${plan.note}</div></div>`;
+  } else {
+    if (plan.note) h += `<div class="day-note">${plan.note}</div>`;
+    // supplements
+    h += `<div class="supp-block"><div class="supp-title">supplements</div>`;
+    SUPPLEMENTS.forEach(s => { h += `<div class="supp-row"><span class="supp-timing">${s.timing}</span><span class="supp-items">${s.items}</span></div>`; });
+    h += `</div>`;
+    // interleaved meals + snacks: breakfast → morning snack → lunch → afternoon snack → dinner
+    const snacks = plan.snacks || [], m = plan.meals;
+    const slots = [
+      m[0]       ? {kind:'meal',  ...m[0]}       : null,
+      snacks[0]  ? {kind:'snack', ...snacks[0]}  : null,
+      m[1]       ? {kind:'meal',  ...m[1]}       : null,
+      snacks[1]  ? {kind:'snack', ...snacks[1]}  : null,
+      m[2]       ? {kind:'meal',  ...m[2]}       : null
+    ].filter(Boolean);
+    slots.forEach(slot => {
+      if (slot.kind === 'meal') {
+        h += `<div class="meal-card" onclick="openRecipeModal('${slot.recipe}')"><div class="meal-type">${slot.type}</div><div class="meal-name">${slot.name}</div><div class="meal-desc">${slot.desc}</div></div>`;
+      } else {
+        h += `<div class="snack-card" onclick="openRecipeModal('${slot.recipe}')"><div class="snack-time">${slot.time}</div><div class="meal-name">${slot.name}</div><div class="meal-desc">${slot.desc}</div></div>`;
+      }
+    });
+  }
+  document.getElementById('day-content').innerHTML = h;
+}
+
+// ── workout view ──
+function getWeekKey() {
+  const n = new Date(), j = new Date(n.getFullYear(),0,1);
+  return n.getFullYear()+'_W'+Math.ceil(((n-j)/86400000+j.getDay()+1)/7);
+}
+
+function renderWoDayStrip() {
+  const now = new Date();
+  const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
+  const WO_TYPE_DOT = {strength:'var(--green)', mobility:'var(--blue)', rest:'var(--muted)', walk:'var(--muted)'};
+  document.getElementById('wo-day-strip').innerHTML = DAYS.map((day,i) => {
+    const d = new Date(ws); d.setDate(ws.getDate()+i);
+    const wo = WO_PLAN[day];
+    const isSel = day === selWoDay, isToday = day === TODAY;
+    let cls = 'day-btn';
+    if (isSel) cls += ' active';
+    if (isToday && !isSel) cls += ' is-today';
+    const dotColor = WO_TYPE_DOT[wo.type] || 'var(--muted)';
+    return `<button class="${cls}" onclick="selectWoDay('${day}')">
+      <span class="day-dname">${DSHORT[i]}</span>
+      <span class="day-dnum">${d.getDate()}</span>
+      <span class="day-dot" style="background:${dotColor}"></span>
+    </button>`;
+  }).join('');
+}
+
+function selectWoDay(day) { selWoDay = day; renderWoDayStrip(); renderWorkout(); }
+
+function renderExCard(ex, session, weights) {
+  const wR = weights[ex.name+'_R'] || '';
+  const wL = weights[ex.name+'_L'] || '';
+  const wS = weights[ex.name] || '';
+  let h = `<div class="ex-card">`;
+  h += `<div class="ex-top"><span class="ex-name">${ex.name}</span><span class="ex-sets">${ex.setsLabel} · ${ex.rest}</span></div>`;
+  if (ex.repsLabel) h += `<div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:6px">${ex.repsLabel}</div>`;
+  if (ex.tempo || ex.breathe) {
+    h += `<div class="ex-chips">`;
+    if (ex.tempo)   h += `<span class="ex-chip chip-tempo">↕ ${ex.tempo}</span>`;
+    if (ex.breathe) h += `<span class="ex-chip chip-breathe">◉ ${ex.breathe}</span>`;
+    h += `</div>`;
+  }
+  if (ex.side) h += `<div class="ex-side">${ex.side}</div>`;
+  h += `<div class="ex-tip">${ex.tip}</div>`;
+  if (ex.asymmetric) {
+    h += `<div class="set-row">
+      <div class="set-grp"><div class="set-lbl">right (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wR}" step="0.5" onchange="saveW('${session}','${ex.name}_R',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">left (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wL}" step="0.5" onchange="saveW('${session}','${ex.name}_L',this.value)"></div>
+    </div>`;
+  } else {
+    h += `<div class="set-row">
+      <div class="set-grp"><div class="set-lbl">weight (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wS}" step="0.5" onchange="saveW('${session}','${ex.name}',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">reps done</div><input type="number" class="set-inp" placeholder="—" step="1"></div>
+    </div>`;
+  }
+  h += `</div>`;
+  return h;
+}
+
+function renderWorkout() {
+  const wo = WO_PLAN[selWoDay];
+  const dayLabel = selWoDay === TODAY ? 'today' : DSHORT[DAYS.indexOf(selWoDay)];
+  let h = '';
+  if (wo.type === 'strength') {
+    const wk = WORKOUTS[wo.session], weights = gs('weights_'+wo.session)||{}, done = gs('done_'+wo.session+'_'+getWeekKey());
+    h += `<div class="wo-header" style="background:var(--green)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wk.name}</div><div class="wo-session-note">${wk.focus} &nbsp;·&nbsp; ${wo.note}</div></div>`;
+    if (done) h += `<div class="done-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>logged this week</div>`;
+    h += `<div class="sec">activation (2 min — after the walk)</div>`;
+    wk.warmup.forEach((w, i) => {
+      h += `<div class="warmup-item"><div class="warmup-num">${i+1}</div><div class="warmup-body"><div class="warmup-name">${w.name}</div><div class="warmup-dur">${w.dur}</div><div class="warmup-note">${w.note}</div></div></div>`;
+    });
+    h += `<div class="sec">exercises</div>`;
+    wk.exercises.forEach(ex => { h += renderExCard(ex, wo.session, weights); });
+    h += `<button class="btn btn-primary btn-mt" onclick="markDone('${wo.session}')">mark session complete</button>`;
+  } else if (wo.type === 'mobility') {
+    h += `<div class="wo-header" style="background:var(--blue)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
+    h += `<div class="sec">corrective protocol</div>`;
+    MOBILITY.forEach(m => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
+    });
+  } else {
+    h += `<div class="rest-card"><div style="font-size:36px;margin-bottom:12px">${wo.type==='rest'?'&#9790;':'&#11835;'}</div><div class="rest-title">${wo.label}</div><div class="rest-note">${wo.note}</div></div>`;
+  }
+  document.getElementById('wo-content').innerHTML = h;
+}
+function saveW(session, ex, val) { const w=gs('weights_'+session)||{}; w[ex]=parseFloat(val)||''; ss('weights_'+session,w); }
+function markDone(session) { ss('done_'+session+'_'+getWeekKey(),true); renderWorkout(); }
+
+// ── recipes view ──
+function renderRecipes() {
+  const groups = { breakfast:[], 'lunch & dinner':[], snacks:[], desserts:[] };
+  Object.entries(RECIPES).forEach(([id,r]) => groups[recCat(id)].push({id,...r}));
+  let h = '';
+  Object.entries(groups).forEach(([name, recipes]) => {
+    if (!recipes.length) return;
+    const col = CAT_COLORS[name] || 'var(--green)';
+    h += `<div class="sec">${name}</div>`;
+    recipes.forEach(r => {
+      h += `<div class="rec-card" id="rc-${r.id}" onclick="toggleRec('${r.id}')">
+        <div class="rec-bar" style="background:${col}"></div>
+        <div class="rec-body">
+          <div class="rec-title">${r.title}</div>
+          <div class="rec-meta">
+            ${r.tags.map(t=>`<span class="rec-tag" style="background:${col}18;color:${col}">${t}</span>`).join('')}
+            <span class="rec-time">${r.time}</span>
+          </div>
+          <div class="rec-ingr">${r.ingr.join(' · ')}</div>
+          <div class="rec-expanded">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:8px">method</div>
+            ${r.steps.map((s,i)=>`<div class="step-item"><span class="step-n" style="background:${col}22;color:${col}">${i+1}</span><span>${s}</span></div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('rec-list').innerHTML = h;
+}
+function toggleRec(id) { document.getElementById('rc-'+id).classList.toggle('open'); }
+function openRecipeModal(id) {
+  const r = RECIPES[id]; if (!r) return;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-title">${r.title}</div>
+    <div class="modal-sub">${r.time} · ${r.tags.join(', ')}</div>
+    <div class="modal-sec">ingredients</div>
+    ${r.ingr.map(i=>`<div class="ingr-item"><span class="ingr-dot"></span>${i}</div>`).join('')}
+    <div class="modal-sec" style="margin-top:16px">method</div>
+    ${r.steps.map((s,i)=>`<div class="step-item"><span class="step-n" style="background:var(--green-light);color:var(--green)">${i+1}</span><span>${s}</span></div>`).join('')}`;
+  document.getElementById('rec-modal').classList.add('open');
+}
+function closeModal(e) { if (e.target===document.getElementById('rec-modal')) document.getElementById('rec-modal').classList.remove('open'); }
+
+// ── shopping view ──
+function renderShopping() {
+  const checked = gs('shop_checked')||[];
+  let h = '';
+  Object.entries(SHOPPING).forEach(([cat,items]) => {
+    h += `<div class="sec">${cat}</div><div class="card" style="padding:0 16px">`;
+    items.forEach(item => {
+      const on = checked.includes(item.id);
+      h += `<div class="shop-item${on?' checked':''}" onclick="toggleShop('${item.id}')"><div class="shop-check">${on?`<svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="white" stroke-width="2.5"><polyline points="2 6 5 9 10 3"/></svg>`:''}</div><span class="shop-name">${item.name}</span>${item.qty?`<span class="shop-qty">${item.qty}</span>`:''}</div>`;
+    });
+    h += `</div>`;
+  });
+  document.getElementById('shop-list').innerHTML = h;
+}
+function toggleShop(id) { const c=gs('shop_checked')||[]; const i=c.indexOf(id); if(i>=0)c.splice(i,1);else c.push(id); ss('shop_checked',c); renderShopping(); }
+function clearChecks() { ss('shop_checked',[]); renderShopping(); }
+
+// ── progress view ──
+function renderProgress() {
+  const log = gs('progress_log')||[], latest=log[log.length-1], prev=log[log.length-2];
+  const start=log.length>0?log[0].weight:98, cur=latest?latest.weight:98;
+  const delta = prev&&latest ? (latest.weight-prev.weight).toFixed(1) : null;
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-card"><div class="stat-lbl">weight</div><div class="stat-val">${cur}<span class="stat-unit"> kg</span></div>
+      <div class="stat-delta ${delta!==null&&parseFloat(delta)<=0?'d-down':'d-up'}">${delta!==null?(parseFloat(delta)>0?'+':'')+delta+' kg this week':'log first check-in'}</div></div>
+    <div class="stat-card"><div class="stat-lbl">body fat</div><div class="stat-val">${latest&&latest.bodyFat?latest.bodyFat+'<span class="stat-unit"> %</span>':'—'}</div>
+      <div class="stat-delta" style="color:var(--muted)">${log.length>0?'started: '+start+' kg':'starting: 98 kg'}</div></div>`;
+  drawChart(log);
+  const hist = document.getElementById('prog-hist');
+  hist.innerHTML = !log.length ? `<div style="color:var(--muted);font-size:13px;padding:12px 0;text-align:center">no entries yet</div>`
+    : [...log].reverse().map(e => { const d=new Date(e.date); return `<div class="log-entry"><span class="log-date">${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span><div class="log-vals"><span class="log-val">${e.weight} kg</span>${e.bodyFat?`<span class="log-val">${e.bodyFat}<span style="font-weight:400;color:var(--muted)"> %</span></span>`:''}</div></div>`; }).join('');
+}
+function logProgress() {
+  const w=parseFloat(document.getElementById('inp-weight').value), b=parseFloat(document.getElementById('inp-bf').value)||null;
+  const inp=document.getElementById('inp-weight');
+  if (!w) { inp.style.borderColor='var(--red)'; setTimeout(()=>inp.style.borderColor='',1500); return; }
+  const log=gs('progress_log')||[]; log.push({date:new Date().toISOString(),weight:w,bodyFat:b}); ss('progress_log',log);
+  document.getElementById('inp-weight').value=''; document.getElementById('inp-bf').value='';
+  renderProgress();
+}
+function drawChart(log) {
+  const cv=document.getElementById('w-chart'), ctx=cv.getContext('2d');
+  const W=cv.offsetWidth||300, H=150, DPR=window.devicePixelRatio||1;
+  cv.width=W*DPR; cv.height=H*DPR; ctx.scale(DPR,DPR);
+  if (log.length < 2) {
+    ctx.fillStyle='#9ca3af'; ctx.font='12px -apple-system,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(log.length===0?'log two check-ins to see your chart':'one more check-in to see your trend',W/2,H/2); return;
+  }
+  const ws=log.map(e=>e.weight), minW=Math.min(...ws)-1, maxW=Math.max(...ws)+1;
+  const pL=38,pR=14,pT=14,pB=26, cW=W-pL-pR, cH=H-pT-pB;
+  const xS=i=>pL+(i/(log.length-1))*cW, yS=w=>pT+(1-(w-minW)/(maxW-minW))*cH;
+  ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){const y=pT+(i/3)*cH;ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.stroke();ctx.fillStyle='#9ca3af';ctx.font='10px -apple-system,sans-serif';ctx.textAlign='right';ctx.fillText((maxW-(i/3)*(maxW-minW)).toFixed(1),pL-4,y+4);}
+  ctx.beginPath(); ctx.moveTo(xS(0),yS(ws[0])); ws.forEach((w,i)=>{if(i>0)ctx.lineTo(xS(i),yS(w));}); ctx.lineTo(xS(ws.length-1),H-pB); ctx.lineTo(xS(0),H-pB); ctx.closePath(); ctx.fillStyle='rgba(45,106,79,0.1)'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(xS(0),yS(ws[0])); ws.forEach((w,i)=>{if(i>0)ctx.lineTo(xS(i),yS(w));}); ctx.strokeStyle='#2d6a4f'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+  ws.forEach((w,i)=>{ctx.beginPath();ctx.arc(xS(i),yS(w),4,0,Math.PI*2);ctx.fillStyle='#2d6a4f';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();});
+  ctx.fillStyle='#9ca3af'; ctx.font='10px -apple-system,sans-serif'; ctx.textAlign='center';
+  const step=Math.max(1,Math.ceil(log.length/4));
+  log.forEach((e,i)=>{if(i%step===0||i===log.length-1){const d=new Date(e.date);ctx.fillText(d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),xS(i),H-6);}});
+}
+
+init();
+</script>
+</body>
+</html>
