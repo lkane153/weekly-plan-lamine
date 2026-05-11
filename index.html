@@ -386,6 +386,15 @@ const MOBILITY = [
   {name:'pigeon pose (or figure-4)',          dur:'60s each side',                         note:'deep hip opener. if pigeon is too intense on the floor, figure-4 on your back targets the same muscles with less knee stress.'}
 ];
 
+const SCOLIOSIS_BLOCK = [
+  {name:'side plank — left only', dur:'2 × 20–40s · 30s rest',
+   note:'lie on left side, forearm on floor, elbow under shoulder. stack feet or stagger for easier entry. brace the left oblique hard — hips stay level, do not let them sag toward the floor or pike up. breathe normally through the hold. if 20 seconds is too hard, drop to left knee. this is your primary left oblique anti-lateral flexion work.'},
+  {name:'suitcase carry — right hand only', dur:'2 × 30–45s walk · 30s rest',
+   note:'hold a dumbbell or kettlebell in the RIGHT hand. walk a straight line, turn, walk back. the left obliques and left QL must actively resist the pull of the weight trying to lean you rightward — that resistance is the training stimulus. keep the left shoulder level and ribcage neutral throughout. do not list toward the weight.'},
+  {name:'cable psoas march — left leg', dur:'2 × 10 reps · 30s rest',
+   note:'SERT pulley at lowest position, ankle strap on left ankle. stand facing away from the machine. drive the left knee up toward hip height against the cable resistance — hold 1 second at the top, lower with control. keep torso upright: do not lean back to assist. left psoas is the target. right leg stays planted, slight knee bend.'}
+];
+
 const RECIPES = {
   'overnight-oats':   { title:'overnight oats',            time:'5 min prep',        tags:['high-fibre','cholesterol-friendly'], ingr:['80g rolled oats','200ml almond milk','1 tbsp flaxseeds','large handful of mixed berries','1 tsp honey'], steps:['Mix oats and almond milk in a jar.','Stir in flaxseeds.','Top with berries and honey.','Cover and refrigerate overnight. eat cold.'] },
   'yogurt-bowl':      { title:'greek yogurt bowl',         time:'5 min',             tags:['probiotic','high-protein'],          ingr:['200g full-fat greek yogurt','1 banana, sliced','small handful of walnuts','1 tbsp chia seeds','1 tsp honey'], steps:['Spoon yogurt into bowl.','Top with banana, walnuts, chia seeds.','Drizzle honey. done.'] },
@@ -634,11 +643,19 @@ function renderWorkout() {
     });
     h += `<div class="sec">exercises</div>`;
     wk.exercises.forEach(ex => { h += renderExCard(ex, wo.session, weights); });
+    h += `<div class="sec">scoliosis core — 6 min finisher</div>`;
+    SCOLIOSIS_BLOCK.forEach(m => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
+    });
     h += `<button class="btn btn-primary btn-mt" onclick="markDone('${wo.session}')">mark session complete</button>`;
   } else if (wo.type === 'mobility') {
     h += `<div class="wo-header" style="background:var(--blue)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
     h += `<div class="sec">corrective protocol</div>`;
     MOBILITY.forEach(m => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
+    });
+    h += `<div class="sec">scoliosis core — post-walk</div>`;
+    SCOLIOSIS_BLOCK.forEach(m => {
       h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
     });
   } else {
