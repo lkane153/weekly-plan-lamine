@@ -248,7 +248,7 @@ const SUPPLEMENTS = [
 
 const MEAL_PLAN = {
   sunday:    { type:'prefaste', note:'last meal before 8pm — fast starts tonight', meals:[
-    {type:'breakfast',name:'overnight oats',desc:'oats, mixed berries, flaxseeds, almond milk',recipe:'overnight-oats'},
+    {type:'breakfast',name:'eggs, salmon & avocado',desc:'3 scrambled eggs, smoked salmon, half avocado, baby spinach — protein-first start before the fast',recipe:'refeed-breakfast'},
     {type:'lunch',name:'smoked mackerel salad',desc:'smoked mackerel, leafy greens, avocado, olive oil & lemon',recipe:'mackerel-salad'},
     {type:'dinner',name:'chicken thighs & quinoa',desc:'grilled chicken thighs, roasted veg, quinoa — finish before 8pm',recipe:'chicken-quinoa'}
   ], snacks:[
@@ -258,7 +258,7 @@ const MEAL_PLAN = {
   monday:    { type:'fast', note:'36h fast — water, black coffee, herbal tea only', meals:[] },
   tuesday:   { type:'refeed', note:'break fast at 8am — high protein to rebuild', meals:[
     {type:'break fast · 8am',name:'eggs, salmon & avocado',desc:'3 scrambled eggs, smoked salmon, half avocado, baby spinach',recipe:'refeed-breakfast'},
-    {type:'lunch',name:'red lentil soup',desc:'red lentils, cumin, turmeric, garlic, wholegrain bread',recipe:'lentil-soup'},
+    {type:'lunch',name:'smoked mackerel salad',desc:'smoked mackerel, leafy greens, avocado, olive oil & lemon — protein-first lunch after the fast',recipe:'mackerel-salad'},
     {type:'dinner',name:'baked salmon',desc:'salmon fillet, steamed broccoli, brown rice',recipe:'baked-salmon'}
   ], snacks:[
     {time:'11am · post-workout',name:'protein shake',desc:'1 scoop protein · 250ml almond milk · recovery',recipe:'protein-shake'},
@@ -273,7 +273,7 @@ const MEAL_PLAN = {
     {time:'3:30pm',name:'almond butter & celery',desc:'3–4 celery stalks · 2 tbsp almond butter',recipe:'almond-celery'}
   ]},
   thursday:  { type:'normal', meals:[
-    {type:'breakfast',name:'oat porridge',desc:'rolled oats, blueberries, chia seeds, almond milk, cinnamon',recipe:'oat-porridge'},
+    {type:'breakfast',name:'protein greek yogurt bowl',desc:'full-fat greek yogurt, protein powder, walnuts, banana, chia seeds — protein-first',recipe:'protein-yogurt-bowl'},
     {type:'lunch',name:'sardines on rye',desc:'sardines in olive oil, rye toast, cucumber, tomato, lemon',recipe:'sardines-rye'},
     {type:'dinner',name:'lean beef bowl',desc:'lean beef strips, roasted sweet potato, green beans',recipe:'beef-bowl'}
   ], snacks:[
@@ -300,11 +300,11 @@ const MEAL_PLAN = {
 
 const WO_PLAN = {
   sunday:    {type:'mobility', label:'walk + corrective',             color:'var(--blue)',  note:'light day before fast'},
-  monday:    {type:'rest',     label:'rest',                          color:'var(--muted)', note:'fast day — walk if comfortable'},
+  monday:    {type:'foot',     label:'foot + mobility',               color:'var(--purple)', note:'fast day — non-taxing: foot drills, corrective mobility, scoliosis'},
   tuesday:   {type:'strength', session:'A', label:'session A — upper pull & press', color:'var(--green)', note:'after the walk · ~18 min · wait 1–2h after breaking fast'},
   wednesday: {type:'mobility', label:'corrective mobility',           color:'var(--blue)',  note:'japanese walk + corrective protocol'},
   thursday:  {type:'strength', session:'B', label:'session B — asymmetric pull',    color:'var(--green)', note:'after the walk · ~18 min · dumbbells'},
-  friday:    {type:'walk',     label:'walk only',                     color:'var(--muted)', note:'active recovery'},
+  friday:    {type:'foot',     label:'foot + mobility',               color:'var(--purple)', note:'active recovery — foot drills, corrective mobility, scoliosis'},
   saturday:  {type:'strength', session:'C', label:'session C — legs & corrective',  color:'var(--green)', note:'after the walk · ~18 min · dumbbells'}
 };
 
@@ -313,7 +313,6 @@ const WORKOUTS = {
     name:'session A — upper pull & press',
     focus:'right upper back · rear delts · upper pec definition',
     warmup:[
-      {name:'short-foot drill — left only', dur:'2 × 10 reps · on foot activation board', note:'use the blackboard foot activation board barefoot. press left big toe firmly down, draw the arch up without curling toes. hold 5 seconds each rep. the textured surface gives much better feedback than flat floor.'},
       {name:'90/90 breathing reset', dur:'5 slow breath cycles', note:'lie on back, knees bent. inhale slowly through the nose into your lower ribs — feel the left side of your ribcage expand. exhale fully through the mouth. this sets your breathing pattern for the whole session.'}
     ],
     exercises:[
@@ -353,19 +352,18 @@ const WORKOUTS = {
     name:'session C — legs & left corrective',
     focus:'left quad · left glute · posterior chain · anti-rotation core',
     warmup:[
-      {name:'short-foot drill — left only', dur:'2 × 10 reps · on foot activation board', note:'use the blackboard foot activation board barefoot. most important activation before any leg session. press left big toe down, lift arch without curling toes. hold 5 seconds. under barbell load this arch pattern is everything.'},
-      {name:'hip airplane — left leg only', dur:'2 × 8 reps · on balance beam', note:'stand on the wooden balance beam left foot only. hinge at hip, rotate torso open and closed. the narrow beam forces your left arch, ankle, and glute to co-activate — far harder than the floor version.'}
+      {name:'hip airplane — left leg only', dur:'2 × 8 reps · on balance beam', note:'stand on the wooden balance beam left foot only. hinge at hip, rotate torso open and closed. the narrow beam forces your left arch, ankle, and glute to co-activate — far harder than the floor version. your foot is already warm from the blackboard block.'}
     ],
     exercises:[
       {name:'barbell back squat', setsLabel:'3×12', repsLabel:'', rest:'75s', tempo:'3-1-1', breathe:'inhale on descent · exhale driving up',
        side:'left knee must track over left big toe the entire descent. left arch stays lifted — if it collapses under the bar the whole left chain fails. add a deliberate left glute squeeze at lockout every rep.',
        tip:'squat rack, bar on upper traps. brace hard before descent. squat to parallel or below — do not cut the range. drive through both heels evenly coming up. keep the left cue front of mind throughout: arch up, knee out, glute squeeze at top.'},
-      {name:'reverse lunge — left extra', setsLabel:'3R / 4L', repsLabel:'10 each', rest:'60s', tempo:'3-1-1', breathe:'inhale on lower · exhale driving up', asymmetric:true,
+      {name:'reverse lunge — left extra', setsLabel:'3R / 4L', repsLabel:'10 each', rest:'45–60s after superset', tempo:'3-1-1', breathe:'inhale on lower · exhale driving up', asymmetric:true,
        side:'left leg does 4 sets, right does 3. step back — reverse lunge protects the knee and loads the glute harder than a forward lunge.',
-       tip:'hold dumbbells at sides. left leg: push hard through the heel coming up. feel left quad and glute working together, not just the quad. torso stays upright throughout.'},
-      {name:'back extension — left glute focus', setsLabel:'3R / 4L', repsLabel:'10R · 12L', rest:'60s', tempo:'2-2-1', breathe:'exhale extending · inhale on lower', asymmetric:true,
+       tip:'superset with back extension below: finish a lunge set → go immediately to back extension → then rest 45–60s. saves ~12 min of idle rest on Saturday. hold dumbbells at sides. left leg: push hard through the heel coming up. feel left quad and glute working together, not just the quad. torso stays upright throughout.'},
+      {name:'back extension — left glute focus', setsLabel:'3R / 4L', repsLabel:'10R · 12L', rest:'45–60s after superset', tempo:'2-2-1', breathe:'exhale extending · inhale on lower', asymmetric:true,
        side:'left side: 4 sets, 12 reps, 2-second hold at the top. this directly trains the left posterior chain — glute and hamstring — in a way no bridge can match.',
-       tip:'back extension bench. cross arms on chest or hold a plate for resistance. hinge at hips, lower torso down, then drive back up to horizontal — do not hyperextend past flat. at the top: hard left glute squeeze, hold 2 seconds. if you feel it only in your lower back, you are not squeezing the glute first.'},
+       tip:'superset with reverse lunge above: finish the lunge set → immediately do a back extension set → then rest 45–60s. back extension bench. cross arms on chest or hold a plate for resistance. hinge at hips, lower torso down, then drive back up to horizontal — do not hyperextend past flat. at the top: hard left glute squeeze, hold 2 seconds. if you feel it only in your lower back, you are not squeezing the glute first.'},
       {name:'cable Pallof press', setsLabel:'3 each', repsLabel:'10 + 2L', rest:'45s', tempo:'hold 2s extended', breathe:'exhale on press · inhale on return',
        side:'left side: 2 extra reps. trains the left core stabilisers that your lower-body asymmetry has been bypassing for years.',
        tip:'SERT pulley at chest height. stand sideways, feet shoulder-width. press straight out, hold 2 seconds, return controlled. do not let the cable rotate your torso. the straighter you stay, the more left core engagement you build.'}
@@ -374,16 +372,11 @@ const WORKOUTS = {
 };
 
 const MOBILITY = [
-  {name:'90/90 breathing reset',              dur:'5 breath cycles · start here',          note:'lie on back, knees bent. inhale slowly into lower ribs — feel left side expand. exhale fully. foundation of the corrective work. do not skip it.'},
-  {name:'foam roller — thoracic spine',       dur:'60s · slow rolls',                      note:'foam roller along upper and mid back. pause on tight spots for 5–10 seconds. opens the thoracic spine before rotation work. especially important for the right upper back.'},
-  {name:'short-foot drill — left only',       dur:'2 × 10 reps · foot activation board',  note:'use the blackboard foot activation board barefoot. press left big toe down, lift arch without curling toes. hold 5 seconds each rep.'},
-  {name:'cat-camel',                          dur:'10 slow reps',                          note:'on hands and knees. full arch up, full arch down. breathe into each position — inhale on arch, exhale on round. no rushing.'},
-  {name:'open book — thoracic rotation',      dur:'8 each side',                           note:'side-lying, knees stacked. top arm sweeps open across the body. follow it with your eyes. right side especially — open that tight right upper back.'},
-  {name:'hip airplane — left leg only',       dur:'2 × 8 reps · on balance board',        note:'stand on left leg on the balance board. rotate torso open and closed like a propeller. the unstable surface makes this significantly harder and more effective.'},
-  {name:'dead bug',                           dur:'2 × 8 each side · left extra',          note:'slow. lower back stays pinned. exhale fully on each rep. left side: 2 extra reps and slower tempo than the right.'},
-  {name:'cable Pallof press hold',            dur:'3 × 10s each side · left extra',        note:'SERT pulley at chest height. press out and hold 10 seconds. left side: 2 extra reps. trains the left core anti-rotation pattern.'},
-  {name:'wall slides',                        dur:'10 slow reps',                          note:'back against wall, arms at 90°. slide arms up overhead — elbows and wrists stay on the wall throughout. opens tight lats and thoracic spine. essential if upper back feels locked up.'},
-  {name:'pigeon pose (or figure-4)',          dur:'60s each side',                         note:'deep hip opener. if pigeon is too intense on the floor, figure-4 on your back targets the same muscles with less knee stress.'}
+  {name:'90/90 breathing reset',        dur:'5 breath cycles · start here',   note:'lie on back, knees bent. inhale slowly into lower ribs — feel left side expand. exhale fully. do not skip it.'},
+  {name:'foam roller — thoracic spine', dur:'60s · slow rolls',               note:'foam roller along upper and mid back. pause on tight spots for 5–10 seconds. opens the thoracic spine before rotation work. especially important for the right upper back.'},
+  {name:'open book — thoracic rotation',dur:'8 each side',                   note:'side-lying, knees stacked. top arm sweeps open across the body. follow it with your eyes. right side especially — open that tight right upper back.'},
+  {name:'hip airplane — left leg only', dur:'2 × 8 reps · on balance board', note:'stand on left leg on the balance board. rotate torso open and closed like a propeller. the unstable surface makes this significantly harder and more effective.'},
+  {name:'dead bug',                     dur:'2 × 8 each side · left extra',  note:'slow. lower back stays pinned. exhale fully on each rep. left side: 2 extra reps and slower tempo than the right.'}
 ];
 
 const SCOLIOSIS_BLOCK = [
@@ -395,25 +388,118 @@ const SCOLIOSIS_BLOCK = [
    note:'SERT pulley at lowest position, ankle strap on left ankle. stand facing away from the machine. drive the left knee up toward hip height against the cable resistance — hold 1 second at the top, lower with control. keep torso upright: do not lean back to assist. left psoas is the target. right leg stays planted, slight knee bend.'}
 ];
 
+const SCOLIOSIS_BLOCK_SHORT = [
+  {name:'side plank — left only', dur:'2 × 20–30s · 30s rest',
+   note:'lie on left side, forearm under shoulder. brace left oblique. hips level. drop to knee if 20s is hard. 2 sets — this is now your primary scoliosis session, not a finisher.'},
+  {name:'cable psoas march — left leg', dur:'2 × 10 reps · 30s rest',
+   note:'SERT pulley lowest, ankle strap on left. march left knee to hip height against cable. hold 1s at top. torso stays upright. 2 sets, deliberate and controlled.'}
+];
+
+const FOOT_DAY_TYPE = {
+  monday:    {type:'stability-heel',     label:'stability · heel',        activation:false},
+  tuesday:   {type:'plank',              label:'arch · plank work',       activation:true},
+  wednesday: {type:'stability-forefoot', label:'stability · forefoot',    activation:false},
+  thursday:  {type:'calf',               label:'calf · toe flexors',      activation:true},
+  friday:    {type:'plank',              label:'arch · plank work',       activation:false},
+  saturday:  {type:'plank',              label:'arch · plank work',       activation:true},
+  sunday:    {type:'calf',               label:'calf · intrinsics',       activation:false}
+};
+
+const FOOT_STABILITY = {
+  forefoot:[
+    {name:'forefoot stability — left', dur:'3–5 × 20–40s · 30–60s rest',
+     note:'setup: two shorter vertical bars on either side of the backfoot board (stable) + one longer vertical bar at the center of the forefoot plank (unstable platform). stand on left leg. toes splayed. goal: keep the forefoot board as parallel and level as the backfoot board. no toe gripping. big toe stays aligned — do not let it fall inward. use toe spreaders. progression: hold a bar or weight overhead once stable.'},
+    {name:'forefoot inversion — left', dur:'3–5 × 20–40s · 30–60s rest',
+     note:'setup: two shorter vertical bars on backfoot board (stable) + one long vertical bar on forefoot board off-center toward the outer edge. this biases the forefoot into pronation — your default collapsed position. actively resist it: keep weight centered across all metatarsals. fight the inward roll. this is direct arch-loading work under a destabilised forefoot.'}
+  ],
+  heel:[
+    {name:'heel stability — left', dur:'3–5 × 20–40s · 30–60s rest',
+     note:'setup: forefoot plank has two perpendicular pegs at top and bottom (stable) + backfoot plank has one vertical peg at center (unstable). balance as long as possible. weight distributed evenly across the whole foot. toes splayed, no gripping. trains the backfoot to hold neutral alignment under unpredictable load.'},
+    {name:'heel inversion — left', dur:'3–5 × 45–60s · 30–60s rest',
+     note:'setup: forefoot plank two parallel perpendicular pegs (stable) + backfoot plank one vertical peg off-center toward the outer foot. the off-center peg biases the heel toward pronation. actively fight it: supinate the heel, drive it outward, hold. direct collapsed-arch correction under load.'}
+  ]
+};
+
+const FOOT_BLOCK_PHASES = [
+  { label:'beginner · phase 1',
+    trigger:'move to phase 2 when you can complete all 9 sets with clean alignment, no toe gripping, and all metatarsals planted throughout.',
+    drills:[
+      {name:'left twisting heel plank', sets:'3', dur:'45s', rest:'30–60s',
+       note:'backfoot board: inner bar elevates heel → heel in inversion. forefoot board: outer bar elevates front → forefoot in eversion. toes splayed, all metatarsals stay planted throughout. start weight on the outer heel. drive load progressively toward 4th and 5th metatarsals. never lift heel or toes. progression: hold weight in left hand once bodyweight is easy.'},
+      {name:'left heel inversion — static', sets:'3', dur:'45s', rest:'30–60s',
+       note:'two horizontal bars on the forefoot plank. vertical bar on the inner edge of the backfoot plant — keeps heel in inversion. drive knee toward 4th and 5th metatarsal. load goes through the lateral outer foot. on the return stroke, force heel into supination. no lifting of heel or metatarsals at any point. progression: weight in left hand.'},
+      {name:'toe plantar flex — left', sets:'3', dur:'45s', rest:'30–60s',
+       note:'plank reversal: toes go on the shorter plank, big toe metatarsal over the bar (this is the reversed setup vs. the previous drills). all bars are parallel. use the toes — especially the big toe — to press the front of the plank toward the floor. do not grip, do not claw. toes stay splayed and long throughout. use toe spreaders. builds toe flexor strength and trains arch indirectly.'}
+    ],
+    calves:[
+      {name:'calf raises — soleus', sets:'3', reps:'8–12 reps', rest:'45–90s',
+       note:'one peg perpendicular at the center edge of the forefoot plank. forefoot on board. push off repeatedly — heel never touches the board, not even between reps. toes splayed, big toe aligned with metatarsal. use wall or stick for balance at this phase. fluid, full-range reps.'},
+      {name:'toe flexors — inclined push-off', sets:'3', reps:'8–12 reps', rest:'45–90s',
+       note:'one peg perpendicular at the front of the forefoot plank → creates incline. engages foot intrinsics more than calf. whole forefoot planted — no leaning out or collapsing in. push off as far forward as possible with even weight across all metatarsals. toes splayed, big toe aligned. lift the active foot off as if starting to walk.'}
+    ]
+  },
+  { label:'intermediate · phase 2',
+    trigger:'move to phase 3 when push-off is clean — big toe stays aligned, toes do not curl, and you can noticeably reduce wall support.',
+    drills:[
+      {name:'left twisting heel plank', sets:'4', dur:'45s', rest:'30–60s',
+       note:'same mechanics as phase 1. toes splayed, all metatarsals planted. drive through 4th/5th. add weight in left hand once bodyweight form is consistent across all 4 sets.'},
+      {name:'left dynamic heel inversion', sets:'3', dur:'45s', rest:'30–60s',
+       note:'backfoot bar moves to center — less inversion lock, more active supination required. forefoot plank stays static (horizontal bars). when driving forward: actively supinate the heel. on return: bring heel back to neutral only — do not supinate on the return. no metatarsal or heel lift throughout.'},
+      {name:'toe plantar flex — left', sets:'3', dur:'30s', rest:'30–60s',
+       note:'same as phase 1. toes on shorter plank over the bar. press down without gripping. toes long and splayed. use toe spreaders.'},
+      {name:'push-off — windlass activation', sets:'3', dur:'30s', rest:'45–60s',
+       note:'from the toe plantar flex position: engage the windlass. big toe in line with its metatarsal, toes splayed and rigid — never curled. lift the heel to rise onto the toes. wall or stick for balance. toes stay straight and rigid throughout. gradually reduce hand support over weeks. add weight when hands-free.'}
+    ],
+    calves:[
+      {name:'calf raises — soleus', sets:'3', reps:'8–12 reps', rest:'45–90s',
+       note:'one peg perpendicular center of forefoot plank. heel never touches. toes splayed, big toe aligned. progress toward no wall support during this phase.'},
+      {name:'toe flexors — inclined push-off', sets:'3', reps:'8–12 reps', rest:'45–90s',
+       note:'peg at front of forefoot plank → incline. whole forefoot planted, no inward or outward lean. push off fully with even weight across all metatarsals. toes splayed.'},
+      {name:'calf & intrinsics — seesaw', sets:'3', reps:'8–12 reps', rest:'45–90s',
+       note:'one peg perpendicular at the center of the forefoot plank → seesaw movement. push off combining incline and decline phases. toes splayed and evenly distributed on metatarsals. hold the top position 1–2 seconds. controlled descent. start with wall or stick for balance — progress to no support, then add weight.'}
+    ]
+  },
+  { label:'advanced · phase 3',
+    trigger:'ongoing — add load in small jumps once all sets are stable and aligned across all 5 sets.',
+    drills:[
+      {name:'left twisting heel plank', sets:'5', dur:'30s', rest:'45–60s',
+       note:'same mechanics, more volume. toes splayed, metatarsals planted. drive through 4th/5th. add weight in left hand as needed.'},
+      {name:'left dynamic heel inversion', sets:'5', dur:'30s', rest:'45–60s',
+       note:'center bar position. heel: neutral → supinated on drive, neutral on return. forefoot stays static. no compensations, no metatarsal lift.'},
+      {name:'push-off — windlass, loaded', sets:'5', dur:'30s', rest:'45–60s',
+       note:'fully hands-free at this stage. big toe aligned, toes long and splayed — never curling. heel lifts cleanly. add weight in small increments once form is consistent. toes straight and rigid throughout the lift.'}
+    ],
+    calves:[
+      {name:'calf raises — soleus', sets:'4', reps:'8–12 reps', rest:'45–90s',
+       note:'no wall support. heel never touches. toes splayed, big toe aligned. add weight — hold a dumbbell in one hand — once bodyweight is easy for all 4 sets.'},
+      {name:'toe flexors — inclined push-off', sets:'4', reps:'8–12 reps', rest:'45–90s',
+       note:'incline peg at front. full push-off, even metatarsal loading. toes splayed and long. no external support. add weight as progression.'},
+      {name:'calf & intrinsics — seesaw', sets:'3', reps:'8–12 reps', rest:'45–90s',
+       note:'center peg seesaw. 1–2s hold at top. controlled descent. no wall support. add weight (hand or vest) once all 3 sets are stable.'}
+    ]
+  }
+];
+
 const RECIPES = {
   'overnight-oats':   { title:'overnight oats',            time:'5 min prep',        tags:['high-fibre','cholesterol-friendly'], ingr:['80g rolled oats','200ml almond milk','1 tbsp flaxseeds','large handful of mixed berries','1 tsp honey'], steps:['Mix oats and almond milk in a jar.','Stir in flaxseeds.','Top with berries and honey.','Cover and refrigerate overnight. eat cold.'] },
   'yogurt-bowl':      { title:'greek yogurt bowl',         time:'5 min',             tags:['probiotic','high-protein'],          ingr:['200g full-fat greek yogurt','1 banana, sliced','small handful of walnuts','1 tbsp chia seeds','1 tsp honey'], steps:['Spoon yogurt into bowl.','Top with banana, walnuts, chia seeds.','Drizzle honey. done.'] },
+  'protein-yogurt-bowl': { title:'protein greek yogurt bowl', time:'5 min',          tags:['high-protein','probiotic'],          ingr:['200g full-fat greek yogurt','1 scoop vanilla protein powder','½ banana, sliced','small handful of walnuts','1 tbsp chia seeds'], steps:['Stir protein powder into yogurt until fully smooth — no lumps.','Top with banana, walnuts, and chia seeds.','Eat cold. the banana sweetens it without needing honey.'] },
   'oat-porridge':     { title:'oat porridge',              time:'5 min',             tags:['high-fibre','cholesterol-friendly'], ingr:['80g rolled oats','300ml almond milk','1 tbsp chia seeds','handful of blueberries','pinch of cinnamon','1 tsp honey'], steps:['Heat oats and almond milk in pan 4–5 min stirring.','Stir in chia seeds and cinnamon.','Pour into bowl, top with blueberries and honey.'] },
   'egg-avocado':      { title:'eggs & avocado toast',      time:'10 min',            tags:['high-protein','healthy-fats'],       ingr:['2 eggs','2 slices wholegrain bread','1 ripe avocado','chilli flakes','salt, pepper','juice of ¼ lemon'], steps:['Boil eggs 7 min (jammy) or 9 min (hard). cool in cold water.','Toast bread.','Mash avocado with lemon, salt, pepper. spread on toast.','Halve eggs and place on top. sprinkle chilli flakes.'] },
   'protein-smoothie': { title:'protein smoothie',          time:'5 min',             tags:['high-protein','pre-workout'],        ingr:['1 scoop protein powder','80g rolled oats','1 ripe banana','1 tbsp almond butter','300ml milk (any)','pinch of cinnamon'], steps:['Add everything to a blender.','Blend 30 seconds until smooth.','Drink immediately.'] },
   'refeed-breakfast': { title:'re-feed: eggs & salmon',    time:'10 min',            tags:['re-feed','high-protein','omega-3'],  ingr:['3 large eggs','80g smoked salmon','½ avocado','handful of baby spinach','1 tsp butter','salt, black pepper, chilli flakes'], steps:['Heat butter in pan on low. crack in eggs.','Stir gently and slowly — pull from heat while slightly underdone.','Plate alongside smoked salmon, sliced avocado, and spinach.','Season. eat slowly — your first meal after 36 hours.'] },
   'mackerel-salad':   { title:'smoked mackerel salad',     time:'10 min',            tags:['omega-3','cholesterol-friendly'],    ingr:['2 smoked mackerel fillets','80g mixed leafy greens','½ avocado, sliced','10 cherry tomatoes','1 tbsp olive oil','juice of ½ lemon','salt and black pepper'], steps:['Flake mackerel into large chunks over the salad base.','Add avocado and tomatoes.','Drizzle olive oil and lemon juice. season and toss.'] },
-  'chicken-quinoa':   { title:'chicken thighs & quinoa',   time:'25 min',            tags:['high-protein','balanced'],           ingr:['2 chicken thighs','80g quinoa','1 courgette','1 bell pepper','1 tbsp olive oil','1 tsp mixed herbs','salt, pepper, garlic powder'], steps:['Cook quinoa per packet (15 min).','Slice veg, toss with olive oil, herbs, salt. roast 200°C 20 min or pan-fry 10 min.','Season chicken. grill or pan-fry 6–7 min each side.','Serve together.'] },
+  'chicken-quinoa':   { title:'chicken thighs & quinoa',   time:'25 min',            tags:['high-protein','balanced'],           ingr:['2 chicken thighs','80g quinoa','1 courgette','100g mushrooms','1 tbsp olive oil','1 tsp mixed herbs','salt, pepper, garlic powder'], steps:['Cook quinoa per packet (15 min).','Slice veg, toss with olive oil, herbs, salt. roast 200°C 20 min or pan-fry 10 min.','Season chicken. grill or pan-fry 6–7 min each side.','Serve together.'] },
   'lentil-soup':      { title:'red lentil soup',           time:'20 min',            tags:['high-fibre','cholesterol-friendly'], ingr:['150g red lentils','1 onion, diced','2 cloves garlic','1 tsp cumin','1 tsp turmeric','400ml vegetable stock','1 tbsp olive oil','1 slice wholegrain bread'], steps:['Heat olive oil. soften onion 5 min, add garlic and spices 1 min.','Add lentils and stock. simmer 15 min until soft.','Blend half for a thicker texture. season.','Serve with wholegrain bread.'] },
   'baked-salmon':     { title:'baked salmon',              time:'20 min',            tags:['omega-3','high-protein'],            ingr:['1 salmon fillet (150–180g)','80g brown rice','200g broccoli','1 lemon','1 tsp olive oil','salt, pepper, dried dill'], steps:['Preheat oven 200°C. start brown rice.','Place salmon on tray. drizzle olive oil, season. bake 15 min.','Steam broccoli 5 min.','Serve with lemon wedges.'] },
   'tuna-chickpea':    { title:'tuna & chickpea salad',     time:'10 min',            tags:['high-protein','cholesterol-friendly'],ingr:['1 tin tuna in spring water, drained','½ tin chickpeas, drained','10 cherry tomatoes, halved','½ cucumber, diced','1 tbsp olive oil','juice of ½ lemon','salt, pepper, parsley'], steps:['Drain tuna and chickpeas.','Combine with tomatoes and cucumber.','Dress with olive oil and lemon. season and toss.'] },
-  'chicken-stirfry':  { title:'chicken stir-fry',          time:'20 min',            tags:['high-protein','quick'],              ingr:['1 chicken breast, sliced thin','150g soba noodles','1 bell pepper, sliced','1 courgette, sliced','2 cloves garlic','1 tsp fresh ginger, grated','2 tbsp low-sodium soy sauce','1 tsp sesame oil'], steps:['Cook noodles per packet. drain.','Heat sesame oil. stir-fry chicken 5 min.','Add veg, garlic, ginger. stir-fry 4 min.','Add noodles and soy sauce. toss. serve.'] },
+  'chicken-stirfry':  { title:'chicken stir-fry',          time:'20 min',            tags:['high-protein','quick'],              ingr:['1 chicken breast, sliced thin','150g soba noodles','100g mushrooms, sliced','1 courgette, sliced','2 cloves garlic','1 tsp fresh ginger, grated','2 tbsp low-sodium soy sauce','1 tsp sesame oil'], steps:['Cook noodles per packet. drain.','Heat sesame oil. stir-fry chicken 5 min.','Add mushrooms, courgette, garlic, ginger. stir-fry 4 min.','Add noodles and soy sauce. toss. serve.'] },
   'sardines-rye':     { title:'sardines on rye',           time:'5 min',             tags:['omega-3','cholesterol-friendly'],    ingr:['1 tin sardines in olive oil','2 slices rye bread','½ cucumber, sliced','1 tomato, sliced','juice of ½ lemon','black pepper, dill'], steps:['Toast rye bread.','Top with sardines, cucumber, and tomato.','Squeeze lemon. season with pepper. serve.'] },
   'beef-bowl':        { title:'lean beef bowl',            time:'25 min',            tags:['high-protein','iron-rich'],          ingr:['150g lean beef strips','1 sweet potato, cubed','150g green beans','1 tbsp olive oil','1 tsp paprika','salt, pepper, garlic powder'], steps:['Toss sweet potato in olive oil, paprika, salt. roast 200°C 20 min.','Season beef. sear in hot pan 3–4 min. rest 2 min.','Steam green beans 5 min.','Serve together.'] },
   'chickpea-curry':   { title:'chickpea spinach curry',    time:'20 min',            tags:['high-fibre','cholesterol-friendly'], ingr:['1 tin chickpeas, drained','80g baby spinach','1 tin light coconut milk','1 tin chopped tomatoes','1 onion','2 cloves garlic','1 tsp each: cumin, turmeric, garam masala','80g brown rice'], steps:['Cook rice per packet.','Fry onion 5 min. add garlic and spices 1 min.','Add tomatoes and coconut milk. simmer 5 min.','Add chickpeas and spinach. stir until wilted. season.','Serve over rice.'] },
-  'mackerel-veg':     { title:'mackerel & mediterranean veg', time:'25 min',         tags:['omega-3','cholesterol-friendly'],    ingr:['2 mackerel fillets','1 courgette, sliced','1 red pepper, diced','10 cherry tomatoes','2 cloves garlic','1 tbsp olive oil','salt, pepper, dried oregano'], steps:['Toss veg with olive oil, garlic, oregano. roast 200°C 20 min.','Score mackerel skin. season both sides.','Pan-sear skin-side down 4 min until crispy. flip 2 min.','Serve mackerel over roasted veg.'] },
+  'mackerel-veg':     { title:'mackerel & mediterranean veg', time:'25 min',         tags:['omega-3','cholesterol-friendly'],    ingr:['2 mackerel fillets','1 courgette, sliced','100g mushrooms, halved','10 cherry tomatoes','2 cloves garlic','1 tbsp olive oil','salt, pepper, dried oregano'], steps:['Toss veg with olive oil, garlic, oregano. roast 200°C 20 min.','Score mackerel skin. season both sides.','Pan-sear skin-side down 4 min until crispy. flip 2 min.','Serve mackerel over roasted veg.'] },
   'chicken-wrap':     { title:'chicken hummus wrap',       time:'15 min',            tags:['high-protein','balanced'],           ingr:['1 chicken breast','1 wholegrain wrap','2 tbsp hummus','mixed salad leaves','½ cucumber, sliced','5 cherry tomatoes','salt, pepper, paprika'], steps:['Season chicken with paprika, salt, pepper. pan-fry 6–7 min each side. rest, slice thin.','Spread hummus on wrap.','Layer salad, cucumber, tomatoes, and chicken.','Fold and slice in half.'] },
-  'prawn-stirfry':    { title:'prawn stir-fry',            time:'15 min',            tags:['high-protein','low-fat','quick'],    ingr:['200g king prawns','80g brown rice','1 bell pepper, sliced','1 courgette, sliced','2 cloves garlic','1 tbsp olive oil','2 tbsp low-sodium soy sauce','1 tsp sesame oil','chilli flakes'], steps:['Cook rice per packet.','Heat olive oil. stir-fry veg and garlic 4 min.','Add prawns. cook 3–4 min until pink.','Add soy sauce and sesame oil. toss. serve over rice.'] },
+  'prawn-stirfry':    { title:'prawn stir-fry',            time:'15 min',            tags:['high-protein','low-fat','quick'],    ingr:['200g king prawns','80g brown rice','100g mushrooms, sliced','1 courgette, sliced','2 cloves garlic','1 tbsp olive oil','2 tbsp low-sodium soy sauce','1 tsp sesame oil','chilli flakes'], steps:['Cook rice per packet.','Heat olive oil. stir-fry mushrooms, courgette, and garlic 4 min.','Add prawns. cook 3–4 min until pink.','Add soy sauce and sesame oil. toss. serve over rice.'] },
   'protein-shake':       { title:'protein shake',                  time:'3 min',                  tags:['high-protein','post-workout'],         ingr:['1 scoop protein powder','250ml almond milk or water','handful of ice','optional: ½ tsp almond butter'], steps:['Add everything to a shaker or blender.','Shake or blend 20 seconds.','Drink within 30–45 min of training for best recovery.'] },
   'boiled-eggs':         { title:'hard-boiled eggs',               time:'10 min',                 tags:['high-protein','zero-carb'],            ingr:['2–3 eggs','pinch of salt and black pepper','optional: paprika or chilli flakes'], steps:['Bring water to a boil. lower eggs in gently.','Cook 9 min for hard, 7 min for jammy yolk.','Transfer to cold water 2 min. peel and season.','Batch cook 4–6 at a time — keeps 5 days in the fridge.'] },
   'salmon-cucumber':     { title:'smoked salmon & cucumber bites', time:'5 min',                  tags:['omega-3','zero-carb','high-protein'],   ingr:['80g smoked salmon, torn into pieces','½ cucumber, sliced into thick rounds','1 tbsp cottage cheese','black pepper, dill, squeeze of lemon'], steps:['Slice cucumber into thick rounds.','Top each with a small amount of cottage cheese.','Lay a piece of salmon on top. finish with dill and lemon.'] },
@@ -453,7 +539,7 @@ const SHOPPING = {
   'produce': [
     {id:'p01',name:'avocados',qty:'3'},{id:'p02',name:'bananas',qty:'4'},{id:'p03',name:'mixed berries (or frozen)',qty:'300g'},
     {id:'p04',name:'blueberries',qty:'150g'},{id:'p05',name:'cherry tomatoes',qty:'400g'},{id:'p06',name:'cucumber',qty:'2'},
-    {id:'p07',name:'bell peppers (mixed)',qty:'4'},{id:'p08',name:'courgettes',qty:'3'},{id:'p09',name:'broccoli',qty:'1 head'},
+    {id:'p07',name:'mushrooms',qty:'300g'},{id:'p08',name:'courgettes',qty:'3'},{id:'p09',name:'broccoli',qty:'1 head'},
     {id:'p10',name:'baby spinach',qty:'200g'},{id:'p11',name:'mixed leafy greens',qty:'150g'},{id:'p12',name:'sweet potato',qty:'2'},
     {id:'p13',name:'green beans',qty:'200g'},{id:'p14',name:'onions',qty:'3'},{id:'p15',name:'garlic',qty:'1 bulb'},
     {id:'p16',name:'fresh ginger',qty:'small piece'},{id:'p17',name:'lemons',qty:'3'},{id:'p18',name:'tomato (large)',qty:'2'}
@@ -497,6 +583,7 @@ const ss = (k,v) => { try { localStorage.setItem('hplan_'+k, JSON.stringify(v));
 const TODAY  = DAYS[new Date().getDay()];
 let selDay   = TODAY;
 let selWoDay = TODAY;
+let footPhase = gs('foot_phase') || 0;
 
 function init() {
   const now = new Date();
@@ -580,7 +667,7 @@ function getWeekKey() {
 function renderWoDayStrip() {
   const now = new Date();
   const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
-  const WO_TYPE_DOT = {strength:'var(--green)', mobility:'var(--blue)', rest:'var(--muted)', walk:'var(--muted)'};
+  const WO_TYPE_DOT = {strength:'var(--green)', mobility:'var(--blue)', foot:'var(--purple)', rest:'var(--muted)', walk:'var(--muted)'};
   document.getElementById('wo-day-strip').innerHTML = DAYS.map((day,i) => {
     const d = new Date(ws); d.setDate(ws.getDate()+i);
     const wo = WO_PLAN[day];
@@ -629,6 +716,63 @@ function renderExCard(ex, session, weights) {
   return h;
 }
 
+function setFootPhase(p) {
+  if (p < 0 || p > 2) return;
+  footPhase = p; ss('foot_phase', p); renderWorkout();
+}
+
+function renderFootBlock(day) {
+  const dayInfo = FOOT_DAY_TYPE[day];
+  if (!dayInfo) return '';
+  const {type, label, activation} = dayInfo;
+  const phase = FOOT_BLOCK_PHASES[footPhase];
+  const btnBase = 'padding:5px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;';
+
+  // Activation mode: strength days — 1 drill × 2 sets, no phase selector, no full session
+  if (activation) {
+    let h = `<div class="sec">foot activation <span style="font-weight:500;color:var(--purple);text-transform:none;letter-spacing:0;font-size:11px">— 1 drill · switch the arch on</span></div>`;
+    h += `<div class="corr-item" style="border-color:#ddd6fe;background:#faf5ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#7c3aed;margin-bottom:5px">purpose</div><div style="font-size:11px;color:#6d28d9;line-height:1.5">one drill, 2 sets — wakes the left arch before loading. full foot sessions happen on Mon/Fri.</div></div>`;
+    if (type === 'plank') {
+      const d = phase.drills[0];
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">2 × ${d.dur} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+    } else if (type === 'calf') {
+      const d = phase.calves[0];
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">2 × ${d.reps} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+    }
+    return h;
+  }
+
+  let h = `<div class="sec">blackboard foot training <span style="font-weight:500;color:var(--blue);text-transform:none;letter-spacing:0;font-size:11px">— ${label}</span></div>`;
+  if (type === 'plank' || type === 'calf') {
+    h += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <button onclick="setFootPhase(${footPhase-1})" style="${btnBase}${footPhase===0?'opacity:0.3;pointer-events:none':''}">← prev</button>
+      <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--blue)">${phase.label}</div>
+      <button onclick="setFootPhase(${footPhase+1})" style="${btnBase}${footPhase===2?'opacity:0.3;pointer-events:none':''}">next →</button>
+    </div>`;
+    h += `<div class="corr-item" style="border-color:#ddd6fe;background:#faf5ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#7c3aed;margin-bottom:5px">progression trigger</div><div style="font-size:11px;color:#6d28d9;line-height:1.5">${phase.trigger}</div></div>`;
+  }
+  if (type === 'plank') {
+    phase.drills.forEach(d => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.sets} × ${d.dur} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+    });
+  } else if (type === 'calf') {
+    phase.calves.forEach(d => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.sets} × ${d.reps} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+    });
+  } else if (type === 'stability-forefoot') {
+    h += `<div class="corr-item" style="border-color:#d1fae5;background:#f0fdf4"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#065f46;margin-bottom:5px">focus</div><div style="font-size:11px;color:#047857;line-height:1.5">ability to align center of mass over the midpoint of the foot with the least energy. train the forefoot to hold neutral under single-leg load.</div></div>`;
+    FOOT_STABILITY.forefoot.forEach(d => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.dur}</span></div><div class="corr-note">${d.note}</div></div>`;
+    });
+  } else if (type === 'stability-heel') {
+    h += `<div class="corr-item" style="border-color:#d1fae5;background:#f0fdf4"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#065f46;margin-bottom:5px">focus</div><div style="font-size:11px;color:#047857;line-height:1.5">backfoot stability and heel inversion — actively oppose the collapsed arch's default pronation. supinate the heel and hold under load.</div></div>`;
+    FOOT_STABILITY.heel.forEach(d => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.dur}</span></div><div class="corr-note">${d.note}</div></div>`;
+    });
+  }
+  return h;
+}
+
 function renderWorkout() {
   const wo = WO_PLAN[selWoDay];
   const dayLabel = selWoDay === TODAY ? 'today' : DSHORT[DAYS.indexOf(selWoDay)];
@@ -637,25 +781,34 @@ function renderWorkout() {
     const wk = WORKOUTS[wo.session], weights = gs('weights_'+wo.session)||{}, done = gs('done_'+wo.session+'_'+getWeekKey());
     h += `<div class="wo-header" style="background:var(--green)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wk.name}</div><div class="wo-session-note">${wk.focus} &nbsp;·&nbsp; ${wo.note}</div></div>`;
     if (done) h += `<div class="done-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>logged this week</div>`;
-    h += `<div class="sec">activation (2 min — after the walk)</div>`;
+    h += renderFootBlock(selWoDay);
+    h += `<div class="sec">activation (2 min — after foot training)</div>`;
     wk.warmup.forEach((w, i) => {
       h += `<div class="warmup-item"><div class="warmup-num">${i+1}</div><div class="warmup-body"><div class="warmup-name">${w.name}</div><div class="warmup-dur">${w.dur}</div><div class="warmup-note">${w.note}</div></div></div>`;
     });
     h += `<div class="sec">exercises</div>`;
     wk.exercises.forEach(ex => { h += renderExCard(ex, wo.session, weights); });
-    h += `<div class="sec">scoliosis core — 6 min finisher</div>`;
-    SCOLIOSIS_BLOCK.forEach(m => {
+    h += `<button class="btn btn-primary btn-mt" onclick="markDone('${wo.session}')">mark session complete</button>`;
+  } else if (wo.type === 'foot') {
+    h += `<div class="wo-header" style="background:var(--purple)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
+    h += renderFootBlock(selWoDay);
+    h += `<div class="sec">corrective mobility</div>`;
+    MOBILITY.forEach(m => {
       h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
     });
-    h += `<button class="btn btn-primary btn-mt" onclick="markDone('${wo.session}')">mark session complete</button>`;
+    h += `<div class="sec">scoliosis core — 4 min</div>`;
+    SCOLIOSIS_BLOCK_SHORT.forEach(m => {
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
+    });
   } else if (wo.type === 'mobility') {
     h += `<div class="wo-header" style="background:var(--blue)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
+    h += renderFootBlock(selWoDay);
     h += `<div class="sec">corrective protocol</div>`;
     MOBILITY.forEach(m => {
       h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
     });
-    h += `<div class="sec">scoliosis core — post-walk</div>`;
-    SCOLIOSIS_BLOCK.forEach(m => {
+    h += `<div class="sec">scoliosis core — 4 min</div>`;
+    SCOLIOSIS_BLOCK_SHORT.forEach(m => {
       h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
     });
   } else {
