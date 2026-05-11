@@ -124,6 +124,18 @@ canvas.chart { width: 100%; height: 150px; display: block; }
 .log-date { color: var(--muted); }
 .log-vals { display: flex; gap: 14px; }
 .log-val { font-weight: 600; }
+.sess-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.sess-tab { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); }
+.sess-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+.ex-hist { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+.ex-hist:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.ex-hist-name { font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+.ex-hist-row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; color: var(--muted); gap: 6px; }
+.ex-hist-row .eh-date { flex: 0 0 60px; }
+.ex-hist-row .eh-wt { font-weight: 600; color: var(--text); flex: 1; }
+.ex-hist-row .eh-reps { flex: 0 0 52px; text-align: right; }
+.ex-hist-empty { padding: 16px; font-size: 13px; color: var(--muted); text-align: center; }
+.set-row-2 { display: flex; gap: 8px; margin-top: 6px; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: flex-end; }
 .modal-overlay.open { display: flex; }
 .modal-sheet { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 20px 44px; width: 100%; max-height: 82vh; overflow-y: auto; }
@@ -145,6 +157,22 @@ canvas.chart { width: 100%; height: 150px; display: block; }
 .snack-card { background: var(--surface); border-radius: var(--radius); border: 1px dashed #c4b5fd; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
 .snack-card:active { border-color: var(--purple); }
 .snack-time { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--purple); margin-bottom: 2px; }
+/* sticky sub-headers */
+.view-sticky { position: sticky; top: var(--hdr); background: var(--bg); z-index: 50; margin: -18px -16px 0; padding: 0 16px 10px; border-bottom: 1px solid var(--border); }
+.view-scroll { padding-top: 14px; }
+/* corrective tracking */
+.corr-track { margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 7px; }
+.corr-track-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); }
+.support-grp { display: flex; gap: 4px; }
+.support-btn { padding: 3px 9px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--bg); font-size: 10px; font-weight: 700; cursor: pointer; color: var(--muted); }
+.support-btn.act { background: var(--purple); border-color: var(--purple); color: #fff; }
+.corr-inp-sm { width: 64px; padding: 5px 4px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: 500; background: var(--bg); color: var(--text); text-align: center; }
+.corr-inp-sm:focus { outline: none; border-color: var(--green); }
+.log-corr-btn { display: block; width: 100%; margin-top: 14px; padding: 12px; border-radius: 10px; border: 1.5px solid var(--purple); background: #faf5ff; color: var(--purple); font-size: 14px; font-weight: 600; cursor: pointer; }
+.log-corr-btn:active { opacity: 0.7; }
+.corr-hist-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.corr-hist-tab { flex: 1; padding: 7px 4px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); }
+.corr-hist-tab.active { background: var(--purple); color: #fff; border-color: var(--purple); }
 /* warm-up */
 .warmup-item { display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; margin-bottom: 6px; align-items: flex-start; }
 .warmup-num { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--blue-light); color: var(--blue); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
@@ -161,20 +189,26 @@ canvas.chart { width: 100%; height: 150px; display: block; }
 </style>
 </head>
 <body>
-
+ 
 <header class="hdr">
   <span class="hdr-logo">plan</span>
   <span class="hdr-week" id="hdr-week"></span>
 </header>
-
+ 
 <main class="main">
   <div class="view active" id="view-week">
-    <div class="day-strip" id="day-strip"></div>
-    <div id="day-content"></div>
+    <div class="view-sticky">
+      <div class="day-strip" id="day-strip"></div>
+      <div id="day-top"></div>
+    </div>
+    <div class="view-scroll" id="day-content"></div>
   </div>
   <div class="view" id="view-workout">
-    <div class="day-strip" id="wo-day-strip"></div>
-    <div id="wo-content"></div>
+    <div class="view-sticky">
+      <div class="day-strip" id="wo-day-strip"></div>
+      <div id="wo-top"></div>
+    </div>
+    <div class="view-scroll" id="wo-content"></div>
   </div>
   <div class="view" id="view-recipes">
     <div id="rec-list"></div>
@@ -206,11 +240,24 @@ canvas.chart { width: 100%; height: 150px; display: block; }
       </div>
       <button class="btn btn-primary" onclick="logProgress()">save check-in</button>
     </div>
-    <div class="sec">history</div>
+    <div class="sec">body history</div>
     <div class="card" style="padding:0 16px"><div id="prog-hist"></div></div>
+    <div class="sec">workout history</div>
+    <div class="sess-tabs">
+      <button class="sess-tab active" onclick="selectHistSess('A',this)">session A</button>
+      <button class="sess-tab" onclick="selectHistSess('B',this)">session B</button>
+      <button class="sess-tab" onclick="selectHistSess('C',this)">session C</button>
+    </div>
+    <div class="card" id="ex-hist-wrap" style="padding:14px 16px"><div class="ex-hist-empty">mark a session complete to start tracking</div></div>
+    <div class="sec">corrective & foot history</div>
+    <div class="corr-hist-tabs">
+      <button class="corr-hist-tab active" onclick="selectCorrHist('foot',this)">foot</button>
+      <button class="corr-hist-tab" onclick="selectCorrHist('scoliosis',this)">scoliosis</button>
+    </div>
+    <div class="card" id="corr-hist-wrap" style="padding:14px 16px"><div class="ex-hist-empty">log a corrective session to start tracking</div></div>
   </div>
 </main>
-
+ 
 <nav class="nav">
   <button class="nav-tab active" onclick="switchView('week',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>week
@@ -228,24 +275,24 @@ canvas.chart { width: 100%; height: 150px; display: block; }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>progress
   </button>
 </nav>
-
+ 
 <div class="modal-overlay" id="rec-modal" onclick="closeModal(event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div id="modal-body"></div>
   </div>
 </div>
-
+ 
 <script>
 const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const DSHORT = ['sun','mon','tue','wed','thu','fri','sat'];
-
+ 
 const SUPPLEMENTS = [
   {timing:'with first meal',       items:'creatine 5g · vitamin D3 1000 IU'},
   {timing:'with dinner',           items:'omega-3 2g EPA/DHA'},
   {timing:'before bed · optional', items:'magnesium glycinate 300mg'}
 ];
-
+ 
 const MEAL_PLAN = {
   sunday:    { type:'prefaste', note:'last meal before 8pm — fast starts tonight', meals:[
     {type:'breakfast',name:'eggs, salmon & avocado',desc:'3 scrambled eggs, smoked salmon, half avocado, baby spinach — protein-first start before the fast',recipe:'refeed-breakfast'},
@@ -297,7 +344,7 @@ const MEAL_PLAN = {
     {time:'3:30pm',name:'crispy roasted chickpeas',desc:'batch cook · high fibre · plant protein',recipe:'roasted-chickpeas'}
   ]}
 };
-
+ 
 const WO_PLAN = {
   sunday:    {type:'mobility', label:'walk + corrective',             color:'var(--blue)',  note:'light day before fast'},
   monday:    {type:'foot',     label:'foot + mobility',               color:'var(--purple)', note:'fast day — non-taxing: foot drills, corrective mobility, scoliosis'},
@@ -307,7 +354,7 @@ const WO_PLAN = {
   friday:    {type:'foot',     label:'foot + mobility',               color:'var(--purple)', note:'active recovery — foot drills, corrective mobility, scoliosis'},
   saturday:  {type:'strength', session:'C', label:'session C — legs & corrective',  color:'var(--green)', note:'after the walk · ~18 min · dumbbells'}
 };
-
+ 
 const WORKOUTS = {
   A: {
     name:'session A — upper pull & press',
@@ -370,7 +417,7 @@ const WORKOUTS = {
     ]
   }
 };
-
+ 
 const MOBILITY = [
   {name:'90/90 breathing reset',        dur:'5 breath cycles · start here',   note:'lie on back, knees bent. inhale slowly into lower ribs — feel left side expand. exhale fully. do not skip it.'},
   {name:'foam roller — thoracic spine', dur:'60s · slow rolls',               note:'foam roller along upper and mid back. pause on tight spots for 5–10 seconds. opens the thoracic spine before rotation work. especially important for the right upper back.'},
@@ -378,7 +425,7 @@ const MOBILITY = [
   {name:'hip airplane — left leg only', dur:'2 × 8 reps · on balance board', note:'stand on left leg on the balance board. rotate torso open and closed like a propeller. the unstable surface makes this significantly harder and more effective.'},
   {name:'dead bug',                     dur:'2 × 8 each side · left extra',  note:'slow. lower back stays pinned. exhale fully on each rep. left side: 2 extra reps and slower tempo than the right.'}
 ];
-
+ 
 const SCOLIOSIS_BLOCK = [
   {name:'side plank — left only', dur:'2 × 20–40s · 30s rest',
    note:'lie on left side, forearm on floor, elbow under shoulder. stack feet or stagger for easier entry. brace the left oblique hard — hips stay level, do not let them sag toward the floor or pike up. breathe normally through the hold. if 20 seconds is too hard, drop to left knee. this is your primary left oblique anti-lateral flexion work.'},
@@ -387,14 +434,14 @@ const SCOLIOSIS_BLOCK = [
   {name:'cable psoas march — left leg', dur:'2 × 10 reps · 30s rest',
    note:'SERT pulley at lowest position, ankle strap on left ankle. stand facing away from the machine. drive the left knee up toward hip height against the cable resistance — hold 1 second at the top, lower with control. keep torso upright: do not lean back to assist. left psoas is the target. right leg stays planted, slight knee bend.'}
 ];
-
+ 
 const SCOLIOSIS_BLOCK_SHORT = [
   {name:'side plank — left only', dur:'2 × 20–30s · 30s rest',
    note:'lie on left side, forearm under shoulder. brace left oblique. hips level. drop to knee if 20s is hard. 2 sets — this is now your primary scoliosis session, not a finisher.'},
   {name:'cable psoas march — left leg', dur:'2 × 10 reps · 30s rest',
    note:'SERT pulley lowest, ankle strap on left. march left knee to hip height against cable. hold 1s at top. torso stays upright. 2 sets, deliberate and controlled.'}
 ];
-
+ 
 const FOOT_DAY_TYPE = {
   monday:    {type:'stability-heel',     label:'stability · heel',        activation:false},
   tuesday:   {type:'plank',              label:'arch · plank work',       activation:true},
@@ -404,7 +451,7 @@ const FOOT_DAY_TYPE = {
   saturday:  {type:'plank',              label:'arch · plank work',       activation:true},
   sunday:    {type:'calf',               label:'calf · intrinsics',       activation:false}
 };
-
+ 
 const FOOT_STABILITY = {
   forefoot:[
     {name:'forefoot stability — left', dur:'3–5 × 20–40s · 30–60s rest',
@@ -419,7 +466,7 @@ const FOOT_STABILITY = {
      note:'setup: forefoot plank two parallel perpendicular pegs (stable) + backfoot plank one vertical peg off-center toward the outer foot. the off-center peg biases the heel toward pronation. actively fight it: supinate the heel, drive it outward, hold. direct collapsed-arch correction under load.'}
   ]
 };
-
+ 
 const FOOT_BLOCK_PHASES = [
   { label:'beginner · phase 1',
     trigger:'move to phase 2 when you can complete all 9 sets with clean alignment, no toe gripping, and all metatarsals planted throughout.',
@@ -479,7 +526,7 @@ const FOOT_BLOCK_PHASES = [
     ]
   }
 ];
-
+ 
 const RECIPES = {
   'overnight-oats':   { title:'overnight oats',            time:'5 min prep',        tags:['high-fibre','cholesterol-friendly'], ingr:['80g rolled oats','200ml almond milk','1 tbsp flaxseeds','large handful of mixed berries','1 tsp honey'], steps:['Mix oats and almond milk in a jar.','Stir in flaxseeds.','Top with berries and honey.','Cover and refrigerate overnight. eat cold.'] },
   'yogurt-bowl':      { title:'greek yogurt bowl',         time:'5 min',             tags:['probiotic','high-protein'],          ingr:['200g full-fat greek yogurt','1 banana, sliced','small handful of walnuts','1 tbsp chia seeds','1 tsp honey'], steps:['Spoon yogurt into bowl.','Top with banana, walnuts, chia seeds.','Drizzle honey. done.'] },
@@ -513,7 +560,7 @@ const RECIPES = {
   'protein-balls':       { title:'no-bake protein balls',          time:'15 min + 30 min chill',  tags:['high-protein','meal-prep','portable'],  ingr:['80g rolled oats','2 scoops protein powder','4 tbsp almond butter','2 tbsp honey','2 tbsp dark chocolate chips (70%+)','1 tbsp chia seeds','2–3 tbsp almond milk to bind'], steps:['Mix oats, protein powder, and chia seeds in a bowl.','Add almond butter and honey. mix well.','Add almond milk one tbsp at a time until mixture holds together when pressed.','Fold in chocolate chips. roll into 10–12 balls. refrigerate 30 min. keeps 5 days.'] },
   'yogurt-bark':         { title:'frozen yogurt bark',             time:'5 min + freeze 3h',      tags:['probiotic','antioxidant','low-effort'], ingr:['300g full-fat greek yogurt','1 tbsp honey','large handful of mixed berries','2 tbsp dark chocolate chips (70%+)','1 tbsp crushed walnuts or chia seeds'], steps:['Mix yogurt and honey. spread on a lined baking tray about 1cm thick.','Scatter berries, chocolate chips, and walnuts across the top.','Freeze at least 3 hours or overnight.','Break into shards from the freezer. keeps 2 weeks.'] }
 };
-
+ 
 const SHOPPING = {
   'protein & fish': [
     {id:'s01',name:'eggs',qty:'1 dozen'},{id:'s02',name:'smoked salmon',qty:'200g'},{id:'s03',name:'salmon fillets',qty:'2 fillets'},
@@ -564,27 +611,29 @@ const SHOPPING = {
     {id:'sp7',name:'cinnamon',qty:''},{id:'sp8',name:'chilli flakes',qty:''},{id:'sp9',name:'dill (dried)',qty:''}
   ]
 };
-
+ 
 const BFAST_IDS   = ['overnight-oats','yogurt-bowl','oat-porridge','egg-avocado','protein-smoothie','refeed-breakfast'];
 const SNACK_IDS   = ['protein-shake','boiled-eggs','salmon-cucumber','walnuts-dark-choc','cottage-cheese-bowl','almond-celery','roasted-chickpeas'];
 const DESSERT_IDS = ['choc-protein-mousse','chia-pudding','banana-nice-cream','protein-balls','yogurt-bark'];
 const CAT_COLORS  = { breakfast:'var(--blue)', 'lunch & dinner':'var(--green)', snacks:'var(--purple)', desserts:'var(--pink)' };
-
+ 
 function recCat(id) {
   if (BFAST_IDS.includes(id))   return 'breakfast';
   if (SNACK_IDS.includes(id))   return 'snacks';
   if (DESSERT_IDS.includes(id)) return 'desserts';
   return 'lunch & dinner';
 }
-
+ 
 const gs = k => { try { const v = localStorage.getItem('hplan_'+k); return v ? JSON.parse(v) : null; } catch(e) { return null; } };
 const ss = (k,v) => { try { localStorage.setItem('hplan_'+k, JSON.stringify(v)); } catch(e) {} };
-
+ 
 const TODAY  = DAYS[new Date().getDay()];
 let selDay   = TODAY;
 let selWoDay = TODAY;
 let footPhase = gs('foot_phase') || 0;
-
+let histSess = 'A';
+let corrHistType = 'foot';
+ 
 function init() {
   const now = new Date();
   const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
@@ -594,7 +643,7 @@ function init() {
   renderDayStrip(); renderDayContent(selDay);
   renderWoDayStrip(); renderWorkout(); renderRecipes(); renderShopping(); renderProgress();
 }
-
+ 
 function switchView(name, btn) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -602,7 +651,7 @@ function switchView(name, btn) {
   btn.classList.add('active');
   if (name === 'progress') setTimeout(() => drawChart(gs('progress_log') || []), 60);
 }
-
+ 
 // ── week view ──
 function renderDayStrip() {
   const now = new Date();
@@ -623,22 +672,22 @@ function renderDayStrip() {
     </button>`;
   }).join('');
 }
-
+ 
 function selectDay(day) { selDay = day; renderDayStrip(); renderDayContent(day); }
-
+ 
 function renderDayContent(day) {
   const plan = MEAL_PLAN[day], wo = WO_PLAN[day];
-  let h = '';
-  if (wo) h += `<div class="wo-badge" style="color:${wo.color}"><span class="wo-dot" style="background:${wo.color}"></span>${wo.label}<span class="wo-note"> — ${wo.note}</span></div>`;
+  let top = '', scroll = '';
   if (plan.type === 'fast') {
-    h += `<div class="fast-banner"><div class="fast-title">36h fast</div><div class="fast-note">${plan.note}</div></div>`;
+    scroll = `<div class="fast-banner"><div class="fast-title">36h fast</div><div class="fast-note">${plan.note}</div></div>`;
   } else {
-    if (plan.note) h += `<div class="day-note">${plan.note}</div>`;
-    // supplements
-    h += `<div class="supp-block"><div class="supp-title">supplements</div>`;
-    SUPPLEMENTS.forEach(s => { h += `<div class="supp-row"><span class="supp-timing">${s.timing}</span><span class="supp-items">${s.items}</span></div>`; });
-    h += `</div>`;
-    // interleaved meals + snacks: breakfast → morning snack → lunch → afternoon snack → dinner
+    // sticky top: workout badge + supplements
+    if (wo) top += `<div class="wo-badge" style="color:${wo.color};margin-top:6px"><span class="wo-dot" style="background:${wo.color}"></span>${wo.label}<span class="wo-note"> — ${wo.note}</span></div>`;
+    top += `<div class="supp-block" style="margin-top:8px;margin-bottom:0"><div class="supp-title">supplements</div>`;
+    SUPPLEMENTS.forEach(s => { top += `<div class="supp-row"><span class="supp-timing">${s.timing}</span><span class="supp-items">${s.items}</span></div>`; });
+    top += `</div>`;
+    // scroll: day note + meals + snacks
+    if (plan.note) scroll += `<div class="day-note">${plan.note}</div>`;
     const snacks = plan.snacks || [], m = plan.meals;
     const slots = [
       m[0]       ? {kind:'meal',  ...m[0]}       : null,
@@ -649,21 +698,22 @@ function renderDayContent(day) {
     ].filter(Boolean);
     slots.forEach(slot => {
       if (slot.kind === 'meal') {
-        h += `<div class="meal-card" onclick="openRecipeModal('${slot.recipe}')"><div class="meal-type">${slot.type}</div><div class="meal-name">${slot.name}</div><div class="meal-desc">${slot.desc}</div></div>`;
+        scroll += `<div class="meal-card" onclick="openRecipeModal('${slot.recipe}')"><div class="meal-type">${slot.type}</div><div class="meal-name">${slot.name}</div><div class="meal-desc">${slot.desc}</div></div>`;
       } else {
-        h += `<div class="snack-card" onclick="openRecipeModal('${slot.recipe}')"><div class="snack-time">${slot.time}</div><div class="meal-name">${slot.name}</div><div class="meal-desc">${slot.desc}</div></div>`;
+        scroll += `<div class="snack-card" onclick="openRecipeModal('${slot.recipe}')"><div class="snack-time">${slot.time}</div><div class="meal-name">${slot.name}</div><div class="meal-desc">${slot.desc}</div></div>`;
       }
     });
   }
-  document.getElementById('day-content').innerHTML = h;
+  document.getElementById('day-top').innerHTML = top;
+  document.getElementById('day-content').innerHTML = scroll;
 }
-
+ 
 // ── workout view ──
 function getWeekKey() {
   const n = new Date(), j = new Date(n.getFullYear(),0,1);
   return n.getFullYear()+'_W'+Math.ceil(((n-j)/86400000+j.getDay()+1)/7);
 }
-
+ 
 function renderWoDayStrip() {
   const now = new Date();
   const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
@@ -683,13 +733,16 @@ function renderWoDayStrip() {
     </button>`;
   }).join('');
 }
-
+ 
 function selectWoDay(day) { selWoDay = day; renderWoDayStrip(); renderWorkout(); }
-
-function renderExCard(ex, session, weights) {
+ 
+function renderExCard(ex, session, weights, reps) {
   const wR = weights[ex.name+'_R'] || '';
   const wL = weights[ex.name+'_L'] || '';
   const wS = weights[ex.name] || '';
+  const rS = reps[ex.name] || '';
+  const rR = reps[ex.name+'_R'] || '';
+  const rL = reps[ex.name+'_L'] || '';
   let h = `<div class="ex-card">`;
   h += `<div class="ex-top"><span class="ex-name">${ex.name}</span><span class="ex-sets">${ex.setsLabel} · ${ex.rest}</span></div>`;
   if (ex.repsLabel) h += `<div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:6px">${ex.repsLabel}</div>`;
@@ -705,120 +758,322 @@ function renderExCard(ex, session, weights) {
     h += `<div class="set-row">
       <div class="set-grp"><div class="set-lbl">right (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wR}" step="0.5" onchange="saveW('${session}','${ex.name}_R',this.value)"></div>
       <div class="set-grp"><div class="set-lbl">left (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wL}" step="0.5" onchange="saveW('${session}','${ex.name}_L',this.value)"></div>
+    </div>
+    <div class="set-row-2">
+      <div class="set-grp"><div class="set-lbl">reps R</div><input type="number" class="set-inp" placeholder="—" value="${rR}" step="1" onchange="saveReps('${session}','${ex.name}_R',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">reps L</div><input type="number" class="set-inp" placeholder="—" value="${rL}" step="1" onchange="saveReps('${session}','${ex.name}_L',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">sets done</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_sets']||''}" step="1" onchange="saveReps('${session}','${ex.name}_sets',this.value)"></div>
     </div>`;
   } else {
     h += `<div class="set-row">
       <div class="set-grp"><div class="set-lbl">weight (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wS}" step="0.5" onchange="saveW('${session}','${ex.name}',this.value)"></div>
-      <div class="set-grp"><div class="set-lbl">reps done</div><input type="number" class="set-inp" placeholder="—" step="1"></div>
+      <div class="set-grp"><div class="set-lbl">reps done</div><input type="number" class="set-inp" placeholder="—" value="${rS}" step="1" onchange="saveReps('${session}','${ex.name}',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">sets done</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_sets']||''}" step="1" onchange="saveReps('${session}','${ex.name}_sets',this.value)"></div>
     </div>`;
   }
   h += `</div>`;
   return h;
 }
-
+ 
 function setFootPhase(p) {
   if (p < 0 || p > 2) return;
   footPhase = p; ss('foot_phase', p); renderWorkout();
 }
-
+ 
+function getCorrVal(name, field) { const c=gs('corr_vals')||{}; return c[name+'__'+field]||''; }
+function saveCorr(name, field, val) { const c=gs('corr_vals')||{}; c[name+'__'+field]=val; ss('corr_vals',c); }
+function saveCorrToggle(name, field, val, btn) {
+  saveCorr(name, field, val);
+  btn.parentElement.querySelectorAll('.support-btn').forEach(b => b.classList.remove('act'));
+  btn.classList.add('act');
+}
+// Foot drills — time-based (plank type): sets done + time per set (s) + weight in hand (kg) + support level
+function renderDrillTrack(d) {
+  const sup=getCorrVal(d.name,'support'), time=getCorrVal(d.name,'time'), wt=getCorrVal(d.name,'weight'), sets=getCorrVal(d.name,'sets');
+  return `<div class="corr-track">
+    <div class="corr-track-row"><span>support</span><div class="support-grp">
+      <button class="support-btn${sup==='none'?' act':''}" onclick="saveCorrToggle('${d.name}','support','none',this)">none</button>
+      <button class="support-btn${sup==='stick'?' act':''}" onclick="saveCorrToggle('${d.name}','support','stick',this)">stick</button>
+      <button class="support-btn${sup==='wall'?' act':''}" onclick="saveCorrToggle('${d.name}','support','wall',this)">wall</button>
+    </div></div>
+    <div class="corr-track-row"><span>sets done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${sets}" step="1" onchange="saveCorr('${d.name}','sets',this.value)"></div>
+    <div class="corr-track-row"><span>time per set (s)</span><input type="number" class="corr-inp-sm" placeholder="—" value="${time}" step="1" onchange="saveCorr('${d.name}','time',this.value)"></div>
+    <div class="corr-track-row"><span>weight in hand (kg)</span><input type="number" class="corr-inp-sm" placeholder="BW" value="${wt}" step="0.5" onchange="saveCorr('${d.name}','weight',this.value)"></div>
+  </div>`;
+}
+// Foot calves — rep-based: support + sets done + reps done + weight added
+function renderCalfTrack(d) {
+  const sup=getCorrVal(d.name,'support'), sets=getCorrVal(d.name,'sets'), reps=getCorrVal(d.name,'reps'), wt=getCorrVal(d.name,'weight');
+  return `<div class="corr-track">
+    <div class="corr-track-row"><span>support</span><div class="support-grp">
+      <button class="support-btn${sup==='none'?' act':''}" onclick="saveCorrToggle('${d.name}','support','none',this)">none</button>
+      <button class="support-btn${sup==='stick'?' act':''}" onclick="saveCorrToggle('${d.name}','support','stick',this)">stick</button>
+      <button class="support-btn${sup==='wall'?' act':''}" onclick="saveCorrToggle('${d.name}','support','wall',this)">wall</button>
+    </div></div>
+    <div class="corr-track-row"><span>sets done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${sets}" step="1" onchange="saveCorr('${d.name}','sets',this.value)"></div>
+    <div class="corr-track-row"><span>reps done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${reps}" step="1" onchange="saveCorr('${d.name}','reps',this.value)"></div>
+    <div class="corr-track-row"><span>weight added (kg)</span><input type="number" class="corr-inp-sm" placeholder="BW" value="${wt}" step="0.5" onchange="saveCorr('${d.name}','weight',this.value)"></div>
+  </div>`;
+}
+// Stability — always on balance board, time-based: sets done + time per set (s)
+function renderStabilityTrack(d) {
+  const sets=getCorrVal(d.name,'sets'), time=getCorrVal(d.name,'time');
+  return `<div class="corr-track">
+    <div class="corr-track-row"><span>sets done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${sets}" step="1" onchange="saveCorr('${d.name}','sets',this.value)"></div>
+    <div class="corr-track-row"><span>time per set (s)</span><input type="number" class="corr-inp-sm" placeholder="—" value="${time}" step="1" onchange="saveCorr('${d.name}','time',this.value)"></div>
+  </div>`;
+}
+// Scoliosis — side plank: sets + time per set; psoas march: sets + reps + cable weight
+function renderScoliosisCorrItem(m) {
+  const isPlank = m.name.includes('plank');
+  const sets=getCorrVal(m.name,'sets'), time=getCorrVal(m.name,'time'), reps=getCorrVal(m.name,'reps'), wt=getCorrVal(m.name,'weight');
+  const track = isPlank
+    ? `<div class="corr-track">
+        <div class="corr-track-row"><span>sets done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${sets}" step="1" onchange="saveCorr('${m.name}','sets',this.value)"></div>
+        <div class="corr-track-row"><span>time per set (s)</span><input type="number" class="corr-inp-sm" placeholder="—" value="${time}" step="1" onchange="saveCorr('${m.name}','time',this.value)"></div>
+      </div>`
+    : `<div class="corr-track">
+        <div class="corr-track-row"><span>sets done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${sets}" step="1" onchange="saveCorr('${m.name}','sets',this.value)"></div>
+        <div class="corr-track-row"><span>reps done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${reps}" step="1" onchange="saveCorr('${m.name}','reps',this.value)"></div>
+        <div class="corr-track-row"><span>cable weight (kg)</span><input type="number" class="corr-inp-sm" placeholder="—" value="${wt}" step="0.5" onchange="saveCorr('${m.name}','weight',this.value)"></div>
+      </div>`;
+  return `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div>${track}</div>`;
+}
+ 
+// Mobility items — varies by exercise:
+//   breathing / foam roller → done checkbox only
+//   open book → reps done (both sides counted together)
+//   hip airplane / dead bug → sets done + reps done
+function renderMobilityItem(m) {
+  const done = getCorrVal(m.name,'done');
+  const sets = getCorrVal(m.name,'sets');
+  const reps = getCorrVal(m.name,'reps');
+  let track;
+  if (m.name.includes('breathing') || m.name.includes('foam roller')) {
+    const checked = done === 'true' ? 'checked' : '';
+    track = `<div class="corr-track"><div class="corr-track-row"><span>completed</span><input type="checkbox" style="width:20px;height:20px;cursor:pointer;accent-color:var(--green)" ${checked} onchange="saveCorr('${m.name}','done',this.checked.toString())"></div></div>`;
+  } else if (m.name.includes('open book')) {
+    track = `<div class="corr-track"><div class="corr-track-row"><span>reps done (each side)</span><input type="number" class="corr-inp-sm" placeholder="—" value="${reps}" step="1" onchange="saveCorr('${m.name}','reps',this.value)"></div></div>`;
+  } else {
+    // hip airplane, dead bug — sets × reps
+    track = `<div class="corr-track">
+      <div class="corr-track-row"><span>sets done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${sets}" step="1" onchange="saveCorr('${m.name}','sets',this.value)"></div>
+      <div class="corr-track-row"><span>reps done</span><input type="number" class="corr-inp-sm" placeholder="—" value="${reps}" step="1" onchange="saveCorr('${m.name}','reps',this.value)"></div>
+    </div>`;
+  }
+  return `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div>${track}</div>`;
+}
+ 
 function renderFootBlock(day) {
   const dayInfo = FOOT_DAY_TYPE[day];
   if (!dayInfo) return '';
   const {type, label, activation} = dayInfo;
   const phase = FOOT_BLOCK_PHASES[footPhase];
   const btnBase = 'padding:5px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;';
-
-  // Activation mode: strength days — 1 drill × 2 sets, no phase selector, no full session
+ 
+  // Activation mode: strength days — 1 drill × 2 sets, no phase selector
   if (activation) {
     let h = `<div class="sec">foot activation <span style="font-weight:500;color:var(--purple);text-transform:none;letter-spacing:0;font-size:11px">— 1 drill · switch the arch on</span></div>`;
     h += `<div class="corr-item" style="border-color:#ddd6fe;background:#faf5ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#7c3aed;margin-bottom:5px">purpose</div><div style="font-size:11px;color:#6d28d9;line-height:1.5">one drill, 2 sets — wakes the left arch before loading. full foot sessions happen on Mon/Fri.</div></div>`;
     if (type === 'plank') {
       const d = phase.drills[0];
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">2 × ${d.dur} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">2 × ${d.dur} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div>${renderDrillTrack(d)}</div>`;
     } else if (type === 'calf') {
       const d = phase.calves[0];
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">2 × ${d.reps} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">2 × ${d.reps} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div>${renderCalfTrack(d)}</div>`;
     }
     return h;
   }
-
+ 
+  // Full session — phase picker always at top regardless of exercise type
   let h = `<div class="sec">blackboard foot training <span style="font-weight:500;color:var(--blue);text-transform:none;letter-spacing:0;font-size:11px">— ${label}</span></div>`;
-  if (type === 'plank' || type === 'calf') {
-    h += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-      <button onclick="setFootPhase(${footPhase-1})" style="${btnBase}${footPhase===0?'opacity:0.3;pointer-events:none':''}">← prev</button>
-      <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--blue)">${phase.label}</div>
-      <button onclick="setFootPhase(${footPhase+1})" style="${btnBase}${footPhase===2?'opacity:0.3;pointer-events:none':''}">next →</button>
-    </div>`;
-    h += `<div class="corr-item" style="border-color:#ddd6fe;background:#faf5ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#7c3aed;margin-bottom:5px">progression trigger</div><div style="font-size:11px;color:#6d28d9;line-height:1.5">${phase.trigger}</div></div>`;
-  }
+  h += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <button onclick="setFootPhase(${footPhase-1})" style="${btnBase}${footPhase===0?'opacity:0.3;pointer-events:none':''}">← prev</button>
+    <div style="flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--blue)">${phase.label}</div>
+    <button onclick="setFootPhase(${footPhase+1})" style="${btnBase}${footPhase===2?'opacity:0.3;pointer-events:none':''}">next →</button>
+  </div>`;
+  h += `<div class="corr-item" style="border-color:#ddd6fe;background:#faf5ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#7c3aed;margin-bottom:5px">progression trigger</div><div style="font-size:11px;color:#6d28d9;line-height:1.5">${phase.trigger}</div></div>`;
   if (type === 'plank') {
     phase.drills.forEach(d => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.sets} × ${d.dur} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.sets} × ${d.dur} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div>${renderDrillTrack(d)}</div>`;
     });
   } else if (type === 'calf') {
     phase.calves.forEach(d => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.sets} × ${d.reps} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div></div>`;
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.sets} × ${d.reps} · rest ${d.rest}</span></div><div class="corr-note">${d.note}</div>${renderCalfTrack(d)}</div>`;
     });
   } else if (type === 'stability-forefoot') {
     h += `<div class="corr-item" style="border-color:#d1fae5;background:#f0fdf4"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#065f46;margin-bottom:5px">focus</div><div style="font-size:11px;color:#047857;line-height:1.5">ability to align center of mass over the midpoint of the foot with the least energy. train the forefoot to hold neutral under single-leg load.</div></div>`;
     FOOT_STABILITY.forefoot.forEach(d => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.dur}</span></div><div class="corr-note">${d.note}</div></div>`;
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.dur}</span></div><div class="corr-note">${d.note}</div>${renderStabilityTrack(d)}</div>`;
     });
   } else if (type === 'stability-heel') {
     h += `<div class="corr-item" style="border-color:#d1fae5;background:#f0fdf4"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#065f46;margin-bottom:5px">focus</div><div style="font-size:11px;color:#047857;line-height:1.5">backfoot stability and heel inversion — actively oppose the collapsed arch's default pronation. supinate the heel and hold under load.</div></div>`;
     FOOT_STABILITY.heel.forEach(d => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.dur}</span></div><div class="corr-note">${d.note}</div></div>`;
+      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${d.name}</span><span class="corr-dur">${d.dur}</span></div><div class="corr-note">${d.note}</div>${renderStabilityTrack(d)}</div>`;
     });
   }
   return h;
 }
-
+ 
 function renderWorkout() {
   const wo = WO_PLAN[selWoDay];
   const dayLabel = selWoDay === TODAY ? 'today' : DSHORT[DAYS.indexOf(selWoDay)];
-  let h = '';
+  let hdr = '', h = '';
   if (wo.type === 'strength') {
-    const wk = WORKOUTS[wo.session], weights = gs('weights_'+wo.session)||{}, done = gs('done_'+wo.session+'_'+getWeekKey());
-    h += `<div class="wo-header" style="background:var(--green)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wk.name}</div><div class="wo-session-note">${wk.focus} &nbsp;·&nbsp; ${wo.note}</div></div>`;
-    if (done) h += `<div class="done-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>logged this week</div>`;
+    const wk = WORKOUTS[wo.session], weights = gs('weights_'+wo.session)||{}, reps = gs('reps_'+wo.session)||{}, done = gs('done_'+wo.session+'_'+getWeekKey());
+    hdr = `<div class="wo-header" style="background:var(--green);margin-top:6px"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wk.name}</div><div class="wo-session-note">${wk.focus} &nbsp;·&nbsp; ${wo.note}</div></div>`;
+    if (done) hdr += `<div class="done-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>logged this week</div>`;
     h += renderFootBlock(selWoDay);
     h += `<div class="sec">activation (2 min — after foot training)</div>`;
     wk.warmup.forEach((w, i) => {
       h += `<div class="warmup-item"><div class="warmup-num">${i+1}</div><div class="warmup-body"><div class="warmup-name">${w.name}</div><div class="warmup-dur">${w.dur}</div><div class="warmup-note">${w.note}</div></div></div>`;
     });
     h += `<div class="sec">exercises</div>`;
-    wk.exercises.forEach(ex => { h += renderExCard(ex, wo.session, weights); });
+    wk.exercises.forEach(ex => { h += renderExCard(ex, wo.session, weights, reps); });
     h += `<button class="btn btn-primary btn-mt" onclick="markDone('${wo.session}')">mark session complete</button>`;
   } else if (wo.type === 'foot') {
-    h += `<div class="wo-header" style="background:var(--purple)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
+    hdr = `<div class="wo-header" style="background:var(--purple);margin-top:6px"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
     h += renderFootBlock(selWoDay);
     h += `<div class="sec">corrective mobility</div>`;
     MOBILITY.forEach(m => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
+      h += renderMobilityItem(m);
     });
     h += `<div class="sec">scoliosis core — 4 min</div>`;
-    SCOLIOSIS_BLOCK_SHORT.forEach(m => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
-    });
+    SCOLIOSIS_BLOCK_SHORT.forEach(m => { h += renderScoliosisCorrItem(m); });
+    h += `<button class="log-corr-btn" onclick="logCorrSession('foot')">log this session</button>`;
   } else if (wo.type === 'mobility') {
-    h += `<div class="wo-header" style="background:var(--blue)"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
+    hdr = `<div class="wo-header" style="background:var(--blue);margin-top:6px"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
     h += renderFootBlock(selWoDay);
     h += `<div class="sec">corrective protocol</div>`;
     MOBILITY.forEach(m => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
+      h += renderMobilityItem(m);
     });
     h += `<div class="sec">scoliosis core — 4 min</div>`;
-    SCOLIOSIS_BLOCK_SHORT.forEach(m => {
-      h += `<div class="corr-item"><div class="corr-header"><span class="corr-name">${m.name}</span><span class="corr-dur">${m.dur}</span></div><div class="corr-note">${m.note}</div></div>`;
-    });
+    SCOLIOSIS_BLOCK_SHORT.forEach(m => { h += renderScoliosisCorrItem(m); });
+    h += `<button class="log-corr-btn" onclick="logCorrSession('mobility')">log this session</button>`;
   } else {
-    h += `<div class="rest-card"><div style="font-size:36px;margin-bottom:12px">${wo.type==='rest'?'&#9790;':'&#11835;'}</div><div class="rest-title">${wo.label}</div><div class="rest-note">${wo.note}</div></div>`;
+    h = `<div class="rest-card"><div style="font-size:36px;margin-bottom:12px">${wo.type==='rest'?'&#9790;':'&#11835;'}</div><div class="rest-title">${wo.label}</div><div class="rest-note">${wo.note}</div></div>`;
   }
+  document.getElementById('wo-top').innerHTML = hdr;
   document.getElementById('wo-content').innerHTML = h;
 }
 function saveW(session, ex, val) { const w=gs('weights_'+session)||{}; w[ex]=parseFloat(val)||''; ss('weights_'+session,w); }
-function markDone(session) { ss('done_'+session+'_'+getWeekKey(),true); renderWorkout(); }
-
+function saveReps(session, ex, val) { const r=gs('reps_'+session)||{}; r[ex]=parseInt(val)||''; ss('reps_'+session,r); }
+function markDone(session) {
+  const weights = gs('weights_'+session)||{};
+  const reps = gs('reps_'+session)||{};
+  const wk = WORKOUTS[session];
+  const snapshot = { date: new Date().toISOString(), session, exercises: {} };
+  wk.exercises.forEach(ex => {
+    const e = {};
+    if (ex.asymmetric) {
+      if (weights[ex.name+'_R']) e.weightR = weights[ex.name+'_R'];
+      if (weights[ex.name+'_L']) e.weightL = weights[ex.name+'_L'];
+      if (reps[ex.name+'_R']) e.repsR = reps[ex.name+'_R'];
+      if (reps[ex.name+'_L']) e.repsL = reps[ex.name+'_L'];
+    } else {
+      if (weights[ex.name]) e.weight = weights[ex.name];
+      if (reps[ex.name]) e.reps = reps[ex.name];
+    }
+    if (reps[ex.name+'_sets']) e.sets = reps[ex.name+'_sets'];
+    snapshot.exercises[ex.name] = e;
+  });
+  const hist = gs('workout_history')||[]; hist.push(snapshot); ss('workout_history', hist);
+  ss('done_'+session+'_'+getWeekKey(), true);
+  renderWorkout(); renderProgress();
+}
+function selectHistSess(s, btn) {
+  histSess = s;
+  document.querySelectorAll('.sess-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderExHistory();
+}
+function renderExHistory() {
+  const allHist = gs('workout_history')||[];
+  const sessHist = allHist.filter(h => h.session === histSess).slice(-10);
+  const wk = WORKOUTS[histSess];
+  const wrap = document.getElementById('ex-hist-wrap');
+  if (!wrap) return;
+  if (!sessHist.length) {
+    wrap.innerHTML = `<div class="ex-hist-empty">mark session ${histSess} complete to start tracking</div>`;
+    return;
+  }
+  let h = '';
+  wk.exercises.forEach(ex => {
+    const entries = sessHist.filter(s => {
+      const e = s.exercises[ex.name];
+      return e && (e.weight || e.weightR || e.weightL || e.reps || e.repsR);
+    });
+    if (!entries.length) return;
+    h += `<div class="ex-hist"><div class="ex-hist-name">${ex.name}</div>`;
+    [...entries].reverse().forEach(s => {
+      const d = new Date(s.date);
+      const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      const e = s.exercises[ex.name];
+      let wtStr = '', repStr = '';
+      if (ex.asymmetric) {
+        const wr = e.weightR||'', wl = e.weightL||'';
+        if (wr||wl) wtStr = `${wr||'?'}R · ${wl||'?'}L kg`;
+        const rr = e.repsR||'', rl = e.repsL||'';
+        if (rr||rl) repStr = `${rr||'?'}R·${rl||'?'}L`;
+      } else {
+        if (e.weight) wtStr = `${e.weight} kg`;
+        if (e.reps) repStr = `${e.reps} reps`;
+      }
+      if (e.sets) repStr += (repStr?' · ':'')+`${e.sets} sets`;
+      h += `<div class="ex-hist-row"><span class="eh-date">${dateStr}</span><span class="eh-wt">${wtStr||'—'}</span><span class="eh-reps">${repStr}</span></div>`;
+    });
+    h += `</div>`;
+  });
+  wrap.innerHTML = h || `<div class="ex-hist-empty">log weight in exercises to see history here</div>`;
+}
+function logCorrSession(type) {
+  const vals = gs('corr_vals')||{};
+  const entry = {date:new Date().toISOString(), type, day:selWoDay, phase:footPhase, data:{...vals}};
+  const hist = gs('corr_history')||[]; hist.push(entry); ss('corr_history', hist);
+  const btn = document.querySelector('.log-corr-btn');
+  if (btn) { const orig=btn.textContent; btn.textContent='session logged ✓'; btn.style.cssText='display:block;width:100%;margin-top:14px;padding:12px;border-radius:10px;border:1.5px solid var(--green);background:var(--green-light);color:var(--green);font-size:14px;font-weight:600;cursor:pointer;'; setTimeout(()=>{btn.textContent=orig;btn.style.cssText='';},2000); }
+  renderProgress();
+}
+function selectCorrHist(type, btn) {
+  corrHistType = type;
+  document.querySelectorAll('.corr-hist-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCorrHistory();
+}
+function renderCorrHistory() {
+  const wrap = document.getElementById('corr-hist-wrap');
+  if (!wrap) return;
+  const allHist = gs('corr_history')||[];
+  const relevant = allHist.filter(h => h.type === corrHistType).slice(-10);
+  if (!relevant.length) { wrap.innerHTML=`<div class="ex-hist-empty">no ${corrHistType} sessions logged yet</div>`; return; }
+  // collect all exercise names that appear in any session
+  const exNames = [];
+  relevant.forEach(s => { Object.keys(s.data).forEach(k => { const n=k.split('__')[0]; if (!exNames.includes(n)) exNames.push(n); }); });
+  let h = '';
+  exNames.forEach(name => {
+    const entries = relevant.filter(s => Object.keys(s.data).some(k => k.startsWith(name+'__')));
+    if (!entries.length) return;
+    h += `<div class="ex-hist"><div class="ex-hist-name">${name}</div>`;
+    [...entries].reverse().forEach(s => {
+      const d = new Date(s.date);
+      const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      const sup = s.data[name+'__support']||'';
+      const sets = s.data[name+'__sets']||'';
+      const time = s.data[name+'__time']||'';
+      const wt = s.data[name+'__weight']||'';
+      const reps = s.data[name+'__reps']||'';
+      const done = s.data[name+'__done'];
+      const ph = s.phase !== undefined ? `ph${s.phase+1}` : '';
+      const detail = done === 'true' ? '✓ done' :
+        [sup, sets?sets+' sets':'', time?time+'s/set':'', wt?wt+'kg':'', reps?reps+' reps':''].filter(Boolean).join(' · ');
+      h += `<div class="ex-hist-row"><span class="eh-date">${dateStr}</span><span class="eh-wt">${detail||'logged'}</span><span class="eh-reps">${ph}</span></div>`;
+    });
+    h += `</div>`;
+  });
+  wrap.innerHTML = h || `<div class="ex-hist-empty">log corrective values in exercises to see history</div>`;
+}
+ 
 // ── recipes view ──
 function renderRecipes() {
   const groups = { breakfast:[], 'lunch & dinner':[], snacks:[], desserts:[] };
@@ -861,7 +1116,7 @@ function openRecipeModal(id) {
   document.getElementById('rec-modal').classList.add('open');
 }
 function closeModal(e) { if (e.target===document.getElementById('rec-modal')) document.getElementById('rec-modal').classList.remove('open'); }
-
+ 
 // ── shopping view ──
 function renderShopping() {
   const checked = gs('shop_checked')||[];
@@ -878,7 +1133,7 @@ function renderShopping() {
 }
 function toggleShop(id) { const c=gs('shop_checked')||[]; const i=c.indexOf(id); if(i>=0)c.splice(i,1);else c.push(id); ss('shop_checked',c); renderShopping(); }
 function clearChecks() { ss('shop_checked',[]); renderShopping(); }
-
+ 
 // ── progress view ──
 function renderProgress() {
   const log = gs('progress_log')||[], latest=log[log.length-1], prev=log[log.length-2];
@@ -893,6 +1148,8 @@ function renderProgress() {
   const hist = document.getElementById('prog-hist');
   hist.innerHTML = !log.length ? `<div style="color:var(--muted);font-size:13px;padding:12px 0;text-align:center">no entries yet</div>`
     : [...log].reverse().map(e => { const d=new Date(e.date); return `<div class="log-entry"><span class="log-date">${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span><div class="log-vals"><span class="log-val">${e.weight} kg</span>${e.bodyFat?`<span class="log-val">${e.bodyFat}<span style="font-weight:400;color:var(--muted)"> %</span></span>`:''}</div></div>`; }).join('');
+  renderExHistory();
+  renderCorrHistory();
 }
 function logProgress() {
   const w=parseFloat(document.getElementById('inp-weight').value), b=parseFloat(document.getElementById('inp-bf').value)||null;
@@ -922,7 +1179,7 @@ function drawChart(log) {
   const step=Math.max(1,Math.ceil(log.length/4));
   log.forEach((e,i)=>{if(i%step===0||i===log.length-1){const d=new Date(e.date);ctx.fillText(d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),xS(i),H-6);}});
 }
-
+ 
 init();
 </script>
 </body>
