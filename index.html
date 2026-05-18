@@ -186,12 +186,16 @@ canvas.chart { width: 100%; height: 150px; display: block; }
 .corr-name { font-size: 14px; font-weight: 600; }
 .corr-dur { font-size: 11px; color: var(--blue); font-weight: 600; white-space: nowrap; }
 .corr-note { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.travel-toggle { padding: 5px 11px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); font-size: 11px; font-weight: 700; cursor: pointer; color: var(--muted); letter-spacing: 0.3px; transition: all 0.15s; }
+.travel-toggle.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.set-row-2 { display: flex; gap: 8px; margin-top: 6px; }
 </style>
 </head>
 <body>
  
 <header class="hdr">
   <span class="hdr-logo">plan</span>
+  <button class="travel-toggle" id="travel-btn" onclick="toggleTravelMode()">gym</button>
   <span class="hdr-week" id="hdr-week"></span>
 </header>
  
@@ -243,11 +247,7 @@ canvas.chart { width: 100%; height: 150px; display: block; }
     <div class="sec">body history</div>
     <div class="card" style="padding:0 16px"><div id="prog-hist"></div></div>
     <div class="sec">workout history</div>
-    <div class="sess-tabs">
-      <button class="sess-tab active" onclick="selectHistSess('A',this)">session A</button>
-      <button class="sess-tab" onclick="selectHistSess('B',this)">session B</button>
-      <button class="sess-tab" onclick="selectHistSess('C',this)">session C</button>
-    </div>
+    <div class="sess-tabs" id="sess-tabs-wrap"></div>
     <div class="card" id="ex-hist-wrap" style="padding:14px 16px"><div class="ex-hist-empty">mark a session complete to start tracking</div></div>
     <div class="sec">corrective & foot history</div>
     <div class="corr-hist-tabs">
@@ -444,6 +444,97 @@ const SCOLIOSIS_BLOCK_SHORT = [
    note:'SERT pulley lowest, ankle strap on left. march left knee to hip height against cable. hold 1s at top. torso stays upright. 2 sets, deliberate and controlled.'}
 ];
  
+const SCOLIOSIS_BLOCK_SHORT_TRAVEL = [
+  {name:'side plank — left only', dur:'2 × 20–30s · 30s rest',
+   note:'lie on left side, forearm under shoulder. brace left oblique. hips level. drop to knee if 20s is hard. 2 sets — primary scoliosis session.'},
+  {name:'standing knee drive — left leg', dur:'2 × 10 reps · 30s rest',
+   note:'stand tall. drive left knee up to hip height — hold 2 seconds at the top, lower with control. keep torso upright: do not lean back to assist. right leg stays planted, soft knee. replaces the cable psoas march — same left hip flexor and core target, no equipment needed. progress: slow the lowering phase to 3 seconds.'}
+];
+ 
+const WO_PLAN_TRAVEL = {
+  sunday:    {type:'mobility', label:'corrective',                                    color:'var(--blue)',   note:'light day — correctives + natural walking'},
+  monday:    {type:'foot',     label:'foot + mobility',                               color:'var(--purple)', note:'bodyweight foot protocol + corrective mobility'},
+  tuesday:   {type:'strength', session:'TA', label:'session T-A — upper push + core', color:'var(--green)', note:'bodyweight · ~40 min'},
+  wednesday: {type:'mobility', label:'corrective mobility',                           color:'var(--blue)',   note:'corrective protocol + walking'},
+  thursday:  {type:'strength', session:'TB', label:'session T-B — lower unilateral',  color:'var(--green)', note:'bodyweight · ~40 min'},
+  friday:    {type:'foot',     label:'foot + mobility',                               color:'var(--purple)', note:'active recovery — foot drills, corrective mobility'},
+  saturday:  {type:'strength', session:'TC', label:'session T-C — full body',          color:'var(--green)', note:'bodyweight · ~35 min'}
+};
+ 
+const WORKOUTS_TRAVEL = {
+  TA: {
+    name:'session T-A — upper push + core',
+    focus:'chest · shoulders · triceps · left-side core',
+    warmup:[
+      {name:'scapular push-up', dur:'2 × 10 reps', note:'hands and knees (or full plank). without bending the elbows: let the shoulder blades squeeze together (chest drops slightly), then protract them forward (upper back rounds up). 10 slow reps. activates the serratus anterior before pressing.'},
+      {name:'90/90 breathing reset', dur:'5 breath cycles', note:'lie on back, knees bent. inhale slowly into the lower ribs — feel the left side expand. exhale fully. sets your breathing pattern for the session.'}
+    ],
+    exercises:[
+      {name:'push-up', setsLabel:'4×max', repsLabel:'target 10+ reps', rest:'60s', tempo:'3-1-1', breathe:'inhale on lower · exhale on press', bodyweight:true,
+       tip:'full range — chest touches the floor. elbows at 45°, not flared wide. week 1–2: standard. week 3–4: try decline (feet on chair) or narrow grip. log your reps each set — this is your push-up strength benchmark over 6 weeks.'},
+      {name:'pike push-up', setsLabel:'3×max', repsLabel:'target 6–10 reps', rest:'60s', tempo:'3-1-1', breathe:'inhale on lower · exhale on press', bodyweight:true,
+       tip:'inverted V — hips high, hands shoulder-width. lower the crown of your head toward the floor, press back up. trains the overhead push pattern and rear delts. steeper the angle, the harder it is. to progress: elevate your feet on a chair.'},
+      {name:'chair dips', setsLabel:'3×max', repsLabel:'target 10+ reps', rest:'45s', tempo:'3-1-1', breathe:'inhale on lower · exhale on press', bodyweight:true,
+       tip:'hands on edge of a sturdy chair, feet extended forward. lower until elbows reach 90° — not deeper. press back up. elbows point straight back, not flared. keep the movement at the elbow only.'},
+      {name:'prone YTW', setsLabel:'3×8 each', rest:'45s', tempo:'1-2-1', breathe:'exhale on lift', bodyweight:true,
+       tip:'lie face down. Y: arms forward at 45°, hold 2s. T: arms straight out to sides, hold 2s. W: elbows bent, hands near ears, squeeze shoulder blades back, hold 2s. rear-delt and external rotator work — no weight needed. these are the structures keeping your shoulder healthy without cables.'},
+      {name:'dead bug — left-side bias', setsLabel:'2×8 each · left extra', rest:'30s', bodyweight:true,
+       side:'left leg: hold 2 seconds at full extension before returning. left side gets 2 extra reps. exhale fully as you extend — think left front ribs down toward left pelvis.',
+       tip:'lie on back. lower back stays pinned to the floor the entire time. move slowly. do not let the low back arch as you extend each limb.'},
+      {name:'hollow body hold', setsLabel:'3 × 15–30s', rest:'30s', timed:true, bodyweight:true,
+       tip:'lie on back. lift arms overhead and both legs to 45°. press lower back into the floor — if it lifts off, raise your legs higher. hold without breath-holding. progress: lower arms to ears, then lower legs gradually. anti-extension core work — replaces the Pallof press.'}
+    ]
+  },
+  TB: {
+    name:'session T-B — lower unilateral',
+    focus:'left quad · left glute · hamstrings · hip stability',
+    warmup:[
+      {name:'hip airplane — left leg only', dur:'2 × 8 reps · on balance board', note:'stand on left leg on the balance board. slight hip hinge. rotate torso open and closed slowly. the unstable surface forces the left glute and arch to work harder.'},
+      {name:'glute bridge', dur:'2 × 10 reps · 2s hold', note:'lie on back, feet flat. drive through heels to bridge up. at the top: hard squeeze of both glutes for 2 seconds. if you feel it only in the hamstrings, push your knees slightly outward as you drive up.'}
+    ],
+    exercises:[
+      {name:'bulgarian split squat', setsLabel:'3R / 4L', repsLabel:'10–12 each', rest:'60s', tempo:'3-1-1', breathe:'inhale on lower · exhale driving up', asymmetric:true, bodyweight:true,
+       side:'left leg leads: 4 sets. left knee tracks over big toe the entire descent. left arch stays lifted. hard left glute squeeze at lockout every rep.',
+       tip:'rear foot elevated on a chair or bed. torso upright. go deep enough that the front thigh approaches parallel. all load drives through the front heel. if balance is the challenge: hold a wall lightly with one fingertip to start.'},
+      {name:'single-leg RDL', setsLabel:'3×10 each', rest:'45s', tempo:'2-1-2', breathe:'inhale on hinge · exhale on return', asymmetric:true, bodyweight:true,
+       side:'left leg standing: focus on left glute and hamstring loading. right arm reaches forward as counterbalance.',
+       tip:'stand on one leg. hinge at the hip — back leg lifts as torso tips forward. spine neutral. feel the hamstring stretch at the bottom. return by driving the standing hip forward. less wobble = stronger hip stabilisers. to progress: hold a full water bottle.'},
+      {name:'nordic curl', setsLabel:'3×5–8', rest:'75s', tempo:'5-0-x', breathe:'exhale on lower', bodyweight:true,
+       tip:'hook feet under bed frame, sofa base, or heavy bag. kneel on a cushion. lower torso forward — fight gravity with your hamstrings the whole way. catch yourself with hands at the bottom, push back up, use the hamstrings to return. 5 slow reps is hard. 8 is very good. the most effective bodyweight hamstring exercise.'},
+      {name:'step-up', setsLabel:'3R / 4L', repsLabel:'10 each', rest:'45s', tempo:'2-1-2', breathe:'inhale on step · exhale on drive', asymmetric:true, bodyweight:true,
+       side:'left leg: 4 sets. drive through the left heel to stand — do not push off the back foot.',
+       tip:'use a chair, sturdy stool, or bottom stair. step onto the surface with the working foot. drive through the heel to stand fully. pause at top with hips level, then step back down with control. ideal height: knee at 90°. to progress: hold a full water bottle.'},
+      {name:'glute bridge march', setsLabel:'3×12 each', rest:'45s', bodyweight:true,
+       side:'left knee drive: 1 extra rep per set, hold 2 seconds at the top.',
+       tip:'lie on back, feet flat. bridge up and hold throughout. alternate lifting each knee toward the chest — marching in place. keep hips level as you march — do not let one side drop. trains the left hip flexor in a position that carries directly into gait efficiency.'}
+    ]
+  },
+  TC: {
+    name:'session T-C — full body',
+    focus:'explosive power · left posterior chain · anti-rotation core',
+    warmup:[
+      {name:"world's greatest stretch", dur:'5 each side', note:"start in plank. step right foot to outside right hand. drop left knee to floor. rotate torso open — right arm sweeps up toward ceiling. follow with your eyes. return and switch sides. 5 slow reps each. opens hip flexors, thoracic spine, and shoulder simultaneously."},
+      {name:'hip airplane — left leg only', dur:'2 × 8 reps · on balance board', note:'stand on left leg. rotate torso open and closed. the board makes this significantly harder. left glute and arch must co-activate.'}
+    ],
+    exercises:[
+      {name:'jump squat', setsLabel:'3×10', rest:'45s', bodyweight:true,
+       tip:'descend to full squat depth, drive through heels explosively. soft landing — absorb through ankles, knees, hips. do not crash down. low-impact option: slow pulse squat (hold 90°, 2 pulses, no jump). 3 × 10 at full effort.'},
+      {name:'push-up to downward dog', setsLabel:'3×8', rest:'45s', bodyweight:true,
+       tip:'from plank: do a full push-up. at the top: press back to downward dog — hips high, heels toward floor. hold 2 seconds: upper back stretches, left serratus gets a lengthened contraction. return to plank. compound movement: push strength + shoulder mobility + thoracic extension.'},
+      {name:'reverse lunge + rotation', setsLabel:'3R / 4L', repsLabel:'10 each', rest:'60s', asymmetric:true, bodyweight:true,
+       side:'left leg back: 4 sets. at the bottom of the lunge, rotate torso toward the front knee — opens the left hip flexor and trains the left oblique under load.',
+       tip:'step back into the lunge. at the bottom: rotate torso toward the front leg — hands reach toward the floor either side of the front foot. rotate open and back. drive through the front heel to stand. bodyweight version of the gym pattern — same asymmetric logic.'},
+      {name:'left side plank', setsLabel:'3 × 20–40s', rest:'30s', timed:true, bodyweight:true,
+       tip:'lie on left side, forearm under shoulder. stack feet or stagger for easier entry. brace left oblique hard — hips stay level. week 1–2: from knees. week 3–4: full side plank. primary left-core hold replacing the Pallof press.'},
+      {name:'copenhagen plank', setsLabel:'3 × 15–30s', rest:'30s', timed:true, bodyweight:true,
+       tip:'lie on your side. place your top foot on a chair or bed edge. hold a side plank from that top foot. bottom leg floats or rests below. trains hip adductors and lateral hip — rarely hit in standard programs. week 1–2: bottom knee on floor as support. week 3–4: both legs straight.'},
+      {name:'plank shoulder taps', setsLabel:'3×10 each', rest:'30s', bodyweight:true,
+       side:'pause 1 second when left arm is lifted — the right oblique and left serratus work harder to resist the rotation.',
+       tip:'high plank. tap right hand to left shoulder, left hand to right shoulder — alternating. hips stay square — resist the rotation. slow and controlled is harder than fast. anti-rotation work replacing the Pallof press.'}
+    ]
+  }
+};
+ 
 const FOOT_DAY_TYPE = {
   monday:    {type:'stability-heel',     label:'stability · heel',        activation:false},
   tuesday:   {type:'plank',              label:'arch · plank work',       activation:true},
@@ -633,7 +724,8 @@ const TODAY  = DAYS[new Date().getDay()];
 let selDay   = TODAY;
 let selWoDay = TODAY;
 let footPhase = gs('foot_phase') || 0;
-let histSess = 'A';
+let travelMode = gs('travel_mode') || false;
+let histSess = travelMode ? 'TA' : 'A';
 let corrHistType = 'foot';
  
 function init() {
@@ -642,8 +734,31 @@ function init() {
   const we = new Date(ws); we.setDate(ws.getDate() + 6);
   const fmt = d => d.toLocaleDateString('en-GB', {day:'numeric',month:'short'});
   document.getElementById('hdr-week').textContent = fmt(ws) + ' – ' + fmt(we);
+  updateTravelBtn();
   renderDayStrip(); renderDayContent(selDay);
   renderWoDayStrip(); renderWorkout(); renderRecipes(); renderShopping(); renderProgress();
+}
+ 
+function toggleTravelMode() {
+  travelMode = !travelMode;
+  ss('travel_mode', travelMode);
+  histSess = travelMode ? 'TA' : 'A';
+  updateTravelBtn();
+  renderWoDayStrip();
+  renderWorkout();
+  renderSessTabs();
+  renderExHistory();
+}
+function updateTravelBtn() {
+  const btn = document.getElementById('travel-btn');
+  if (!btn) return;
+  if (travelMode) {
+    btn.textContent = '✈ travel';
+    btn.classList.add('active');
+  } else {
+    btn.textContent = 'gym';
+    btn.classList.remove('active');
+  }
 }
  
 function switchView(name, btn) {
@@ -720,9 +835,10 @@ function renderWoDayStrip() {
   const now = new Date();
   const ws = new Date(now); ws.setDate(now.getDate() - now.getDay());
   const WO_TYPE_DOT = {strength:'var(--green)', mobility:'var(--blue)', foot:'var(--purple)', rest:'var(--muted)', walk:'var(--muted)'};
+  const plan = travelMode ? WO_PLAN_TRAVEL : WO_PLAN;
   document.getElementById('wo-day-strip').innerHTML = DAYS.map((day,i) => {
     const d = new Date(ws); d.setDate(ws.getDate()+i);
-    const wo = WO_PLAN[day];
+    const wo = plan[day];
     const isSel = day === selWoDay, isToday = day === TODAY;
     let cls = 'day-btn';
     if (isSel) cls += ' active';
@@ -756,7 +872,14 @@ function renderExCard(ex, session, weights, reps) {
   }
   if (ex.side) h += `<div class="ex-side">${ex.side}</div>`;
   h += `<div class="ex-tip">${ex.tip}</div>`;
-  if (ex.asymmetric) {
+  if (ex.asymmetric && ex.bodyweight) {
+    // bodyweight asymmetric — reps only, no weight fields
+    h += `<div class="set-row-2">
+      <div class="set-grp"><div class="set-lbl">reps R</div><input type="number" class="set-inp" placeholder="—" value="${rR}" step="1" onchange="saveReps('${session}','${ex.name}_R',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">reps L</div><input type="number" class="set-inp" placeholder="—" value="${rL}" step="1" onchange="saveReps('${session}','${ex.name}_L',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">sets done</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_sets']||''}" step="1" onchange="saveReps('${session}','${ex.name}_sets',this.value)"></div>
+    </div>`;
+  } else if (ex.asymmetric) {
     h += `<div class="set-row">
       <div class="set-grp"><div class="set-lbl">right (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wR}" step="0.5" onchange="saveW('${session}','${ex.name}_R',this.value)"></div>
       <div class="set-grp"><div class="set-lbl">left (kg)</div><input type="number" class="set-inp" placeholder="—" value="${wL}" step="0.5" onchange="saveW('${session}','${ex.name}_L',this.value)"></div>
@@ -764,6 +887,18 @@ function renderExCard(ex, session, weights, reps) {
     <div class="set-row-2">
       <div class="set-grp"><div class="set-lbl">reps R</div><input type="number" class="set-inp" placeholder="—" value="${rR}" step="1" onchange="saveReps('${session}','${ex.name}_R',this.value)"></div>
       <div class="set-grp"><div class="set-lbl">reps L</div><input type="number" class="set-inp" placeholder="—" value="${rL}" step="1" onchange="saveReps('${session}','${ex.name}_L',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">sets done</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_sets']||''}" step="1" onchange="saveReps('${session}','${ex.name}_sets',this.value)"></div>
+    </div>`;
+  } else if (ex.bodyweight && ex.timed) {
+    // bodyweight timed — time per set + sets done
+    h += `<div class="set-row">
+      <div class="set-grp"><div class="set-lbl">time per set (s)</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_time']||''}" step="1" onchange="saveReps('${session}','${ex.name}_time',this.value)"></div>
+      <div class="set-grp"><div class="set-lbl">sets done</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_sets']||''}" step="1" onchange="saveReps('${session}','${ex.name}_sets',this.value)"></div>
+    </div>`;
+  } else if (ex.bodyweight) {
+    // bodyweight reps — reps done + sets done, no weight
+    h += `<div class="set-row">
+      <div class="set-grp"><div class="set-lbl">reps done</div><input type="number" class="set-inp" placeholder="—" value="${rS}" step="1" onchange="saveReps('${session}','${ex.name}',this.value)"></div>
       <div class="set-grp"><div class="set-lbl">sets done</div><input type="number" class="set-inp" placeholder="—" value="${reps[ex.name+'_sets']||''}" step="1" onchange="saveReps('${session}','${ex.name}_sets',this.value)"></div>
     </div>`;
   } else {
@@ -924,11 +1059,12 @@ function renderFootBlock(day) {
 }
  
 function renderWorkout() {
-  const wo = WO_PLAN[selWoDay];
+  const wo = (travelMode ? WO_PLAN_TRAVEL : WO_PLAN)[selWoDay];
   const dayLabel = selWoDay === TODAY ? 'today' : DSHORT[DAYS.indexOf(selWoDay)];
   let hdr = '', h = '';
   if (wo.type === 'strength') {
-    const wk = WORKOUTS[wo.session], weights = gs('weights_'+wo.session)||{}, reps = gs('reps_'+wo.session)||{}, done = gs('done_'+wo.session+'_'+getWeekKey());
+    const workoutSet = travelMode ? WORKOUTS_TRAVEL : WORKOUTS;
+    const wk = workoutSet[wo.session], weights = gs('weights_'+wo.session)||{}, reps = gs('reps_'+wo.session)||{}, done = gs('done_'+wo.session+'_'+getWeekKey());
     hdr = `<div class="wo-header" style="background:var(--green);margin-top:6px"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wk.name}</div><div class="wo-session-note">${wk.focus} &nbsp;·&nbsp; ${wo.note}</div></div>`;
     if (done) hdr += `<div class="done-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>logged this week</div>`;
     h += renderFootBlock(selWoDay);
@@ -941,25 +1077,23 @@ function renderWorkout() {
     h += `<button class="btn btn-primary btn-mt" onclick="markDone('${wo.session}')">mark session complete</button>`;
   } else if (wo.type === 'foot') {
     hdr = `<div class="wo-header" style="background:var(--purple);margin-top:6px"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
+    const scolBlock = travelMode ? SCOLIOSIS_BLOCK_SHORT_TRAVEL : SCOLIOSIS_BLOCK_SHORT;
     h += renderFootBlock(selWoDay);
     h += `<div class="sec">corrective mobility</div>`;
     h += `<div class="corr-item" style="border-color:#bfdbfe;background:#eff6ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#1e40af;margin-bottom:5px">walk breathing cue — use during first 5 min and anytime the left side feels off</div><div style="font-size:11px;color:#1d4ed8;line-height:1.6">inhale through the nose into the left lower ribs — 3–4 seconds. exhale through the mouth — 5–6 seconds, feel the left ribs drop and left lower abs gently turn on. left foot: big toe + heel contact. left ribs: expand on inhale. left lower abs: turn on during exhale. neck quiet, arms swing naturally.</div></div>`;
-    MOBILITY.forEach(m => {
-      h += renderMobilityItem(m);
-    });
+    MOBILITY.forEach(m => { h += renderMobilityItem(m); });
     h += `<div class="sec">scoliosis core — 4 min</div>`;
-    SCOLIOSIS_BLOCK_SHORT.forEach(m => { h += renderScoliosisCorrItem(m); });
+    scolBlock.forEach(m => { h += renderScoliosisCorrItem(m); });
     h += `<button class="log-corr-btn" onclick="logCorrSession('foot')">log this session</button>`;
   } else if (wo.type === 'mobility') {
+    const scolBlock = travelMode ? SCOLIOSIS_BLOCK_SHORT_TRAVEL : SCOLIOSIS_BLOCK_SHORT;
     hdr = `<div class="wo-header" style="background:var(--blue);margin-top:6px"><div class="wo-session-label">${dayLabel}</div><div class="wo-session-name">${wo.label}</div><div class="wo-session-note">${wo.note}</div></div>`;
     h += renderFootBlock(selWoDay);
     h += `<div class="sec">corrective protocol</div>`;
     h += `<div class="corr-item" style="border-color:#bfdbfe;background:#eff6ff"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#1e40af;margin-bottom:5px">walk breathing cue — use during first 5 min and anytime the left side feels off</div><div style="font-size:11px;color:#1d4ed8;line-height:1.6">inhale through the nose into the left lower ribs — 3–4 seconds. exhale through the mouth — 5–6 seconds, feel the left ribs drop and left lower abs gently turn on. left foot: big toe + heel contact. left ribs: expand on inhale. left lower abs: turn on during exhale. neck quiet, arms swing naturally.</div></div>`;
-    MOBILITY.forEach(m => {
-      h += renderMobilityItem(m);
-    });
+    MOBILITY.forEach(m => { h += renderMobilityItem(m); });
     h += `<div class="sec">scoliosis core — 4 min</div>`;
-    SCOLIOSIS_BLOCK_SHORT.forEach(m => { h += renderScoliosisCorrItem(m); });
+    scolBlock.forEach(m => { h += renderScoliosisCorrItem(m); });
     h += `<button class="log-corr-btn" onclick="logCorrSession('mobility')">log this session</button>`;
   } else {
     h = `<div class="rest-card"><div style="font-size:36px;margin-bottom:12px">${wo.type==='rest'?'&#9790;':'&#11835;'}</div><div class="rest-title">${wo.label}</div><div class="rest-note">${wo.note}</div></div>`;
@@ -972,7 +1106,7 @@ function saveReps(session, ex, val) { const r=gs('reps_'+session)||{}; r[ex]=par
 function markDone(session) {
   const weights = gs('weights_'+session)||{};
   const reps = gs('reps_'+session)||{};
-  const wk = WORKOUTS[session];
+  const wk = WORKOUTS[session] || WORKOUTS_TRAVEL[session];
   const snapshot = { date: new Date().toISOString(), session, exercises: {} };
   wk.exercises.forEach(ex => {
     const e = {};
@@ -1001,11 +1135,11 @@ function selectHistSess(s, btn) {
 function renderExHistory() {
   const allHist = gs('workout_history')||[];
   const sessHist = allHist.filter(h => h.session === histSess).slice(-10);
-  const wk = WORKOUTS[histSess];
+  const wk = WORKOUTS[histSess] || WORKOUTS_TRAVEL[histSess];
   const wrap = document.getElementById('ex-hist-wrap');
   if (!wrap) return;
   if (!sessHist.length) {
-    wrap.innerHTML = `<div class="ex-hist-empty">mark session ${histSess} complete to start tracking</div>`;
+    wrap.innerHTML = `<div class="ex-hist-empty">mark session ${histSess.replace('T','T-')} complete to start tracking</div>`;
     return;
   }
   let h = '';
@@ -1144,6 +1278,15 @@ function renderShopping() {
 function toggleShop(id) { const c=gs('shop_checked')||[]; const i=c.indexOf(id); if(i>=0)c.splice(i,1);else c.push(id); ss('shop_checked',c); renderShopping(); }
 function clearChecks() { ss('shop_checked',[]); renderShopping(); }
  
+function renderSessTabs() {
+  const tabs = travelMode
+    ? [{id:'TA',label:'T-A'},{id:'TB',label:'T-B'},{id:'TC',label:'T-C'}]
+    : [{id:'A',label:'session A'},{id:'B',label:'session B'},{id:'C',label:'session C'}];
+  if (!tabs.find(t => t.id === histSess)) histSess = tabs[0].id;
+  const wrap = document.getElementById('sess-tabs-wrap');
+  if (wrap) wrap.innerHTML = tabs.map(t => `<button class="sess-tab${histSess===t.id?' active':''}" onclick="selectHistSess('${t.id}',this)">${t.label}</button>`).join('');
+}
+ 
 // ── progress view ──
 function renderProgress() {
   const log = gs('progress_log')||[], latest=log[log.length-1], prev=log[log.length-2];
@@ -1158,6 +1301,7 @@ function renderProgress() {
   const hist = document.getElementById('prog-hist');
   hist.innerHTML = !log.length ? `<div style="color:var(--muted);font-size:13px;padding:12px 0;text-align:center">no entries yet</div>`
     : [...log].reverse().map(e => { const d=new Date(e.date); return `<div class="log-entry"><span class="log-date">${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span><div class="log-vals"><span class="log-val">${e.weight} kg</span>${e.bodyFat?`<span class="log-val">${e.bodyFat}<span style="font-weight:400;color:var(--muted)"> %</span></span>`:''}</div></div>`; }).join('');
+  renderSessTabs();
   renderExHistory();
   renderCorrHistory();
 }
